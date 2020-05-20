@@ -21,9 +21,6 @@
                             <v-list-item @click="generatePdf">
                                 <v-list-item-title><v-icon>mdi-printer</v-icon>Print</v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="approveQuery">
-                                <v-list-item-title><v-icon>mdi-file-check-outline</v-icon>Approve</v-list-item-title>
-                            </v-list-item>
                             <v-list-item @click="rejectQuery">
                                 <v-list-item-title><v-icon>mdi-file-excel</v-icon>Reject</v-list-item-title>
                             </v-list-item>
@@ -32,10 +29,10 @@
                 </v-card-title>
                 <v-list class="transparent">
                     <v-list-item>
-                        <v-list-item-title>Type</v-list-item-title>
                         <v-list-item-icon>
-                            <v-icon>mdi-music-clef-bass</v-icon>
+                            <v-icon>mdi-layers</v-icon>
                         </v-list-item-icon>
+                        <v-list-item-title>Type</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.type.reduce((acc, elem) => acc + ', ' + elem ) }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
@@ -56,9 +53,9 @@
                         <template v-slot:activator>
                             <v-list-item-title>Activities</v-list-item-title>
                         </template>
-                        <v-list-item v-for="activity in query.activities" :key="activity.name">
+                        <v-list-item v-for="(activity, index) in query.activities" :key="index">
                             <v-list-item-content>
-                                <v-list-item-title>{{activity.name}} Price with VAT: {{activity.price * 1.2}}</v-list-item-title>
+                                <v-list-item-title>{{index + 1}}. {{activity.company}} - {{activity.name}} Price with VAT: {{activity.price * 1.2}}</v-list-item-title>
                                 <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
@@ -85,11 +82,11 @@
                         <v-list-item-subtitle class="text-right">{{ query.reason }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
-                        <v-list-item-title>Companies</v-list-item-title>
                         <v-list-item-icon>
-                            <v-icon>mdi-music-clef-bass</v-icon>
+                            <v-icon>mdi-card-bulleted</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-subtitle class="text-right">{{ query.companies.reduce((acc, elem) => acc + ', ' + elem ) }}</v-list-item-subtitle>
+                        <v-list-item-title>Companies</v-list-item-title>
+                        <v-list-item-subtitle class="text-right">{{ query.companies }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
@@ -97,6 +94,13 @@
                         </v-list-item-icon>
                         <v-list-item-title>Pay Date</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.payDate }}</v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item>
+                        <v-list-item-icon>
+                            <v-icon>mdi-cash-register</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>Payment Method</v-list-item-title>
+                        <v-list-item-subtitle class="text-right">{{ query.paymentMethod }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
@@ -121,14 +125,26 @@
 <script>
     import * as pdfMake from 'pdfmake/build/pdfmake.js';
     import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+    import {all, create} from 'mathjs'
+
+    const math = create(all);
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+    function translatePayment(payment) {
+        switch (payment) {
+            case 'bank':
+                return 'по банка';
+            case 'cash':
+                return 'на каса';
+        }
+    }
 
     function generateDefinition(query, user) {
         let definition = {
             content: [],
             styles: {
                 title: {
-                    fontSize: 26,
+                    fontSize: 28,
                     bold: true,
                     alignment: 'center'
                 },
@@ -137,7 +153,7 @@
                     alignment: 'center'
                 },
                 subHeading: {
-                    fontSize: 18,
+                    fontSize: 15,
                     bold: true,
                     alignment: 'right'
                 },
@@ -152,17 +168,37 @@
                     fontSize: 17
                 },
                 signature: {
-                    fontSize: 15,
+                    //fontSize: 15,
                     italics: true
                 },
                 signatureRight: {
-                    fontSize: 15,
+                    //fontSize: 15,
                     italics: true,
                     alignment: 'right'
                 },
                 date: {
                     fontSize: 12,
                     italics: true
+                },
+                queryTitle: {
+                    bold: true,
+                    //alignment: 'left'
+                },
+                rightAlign: {
+                    alignment: 'right'
+                },
+                rightAlignBold: {
+                    alignment: 'right',
+                    bold: true
+                },
+                totalSumRight: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'right'
+                },
+                totalSum: {
+                    fontSize: 15,
+                    bold: true
                 }
             },
             pageSize: 'A4',
@@ -172,64 +208,112 @@
         let contragent = {
             columns: [{
                 stack: [],
-                fontSize: 16
+                width: 'auto'
             },{
                 stack: [],
-                fontSize: 16
+                width: 'auto',
+                style: 'queryTitle'
             }],
-            margin: [25, 10, 25, 50],
-            columnGap: 18
+            columnGap: 8,
+            margin: [15, 20, 15, 0]
         };
 
-        let totalVAT = {
-            columns: [{
-                stack: [],
-                fontSize: 16
-            },{
-                stack: [],
-                fontSize: 16
-            }],
-            margin: [25, 0],
-            columnGap: 18
-        };
 
-        let activities = {
-            table: {
-                headerRows: 1,
-                widths: [ 160, 160, 160 ],
-
-                body:[
-                    [ 'Дейност', 'Обект', 'Сума без ДДС' ]
-                ]
-            },
-            margin: [25, 10]
-        };
-
-        let totalSum = 0;
         let payDate = new Date(query.payDate);
         let dateCreated = new Date(query.dateCreated);
 
-        definition.content.push({ text: 'За нуждите на ПЕ', style: 'subHeading'});
-        definition.content.push({ text: 'ЗАЯВКА', style: 'title'});
-        definition.content.push({ text: 'За отпускане на финансиране към фирмите', style: 'center'});
-        definition.content.push({ text: query.companies.reduce((acc, elem) => acc + ', ' + elem ), style: 'companies'});
+        definition.content.push({ text: 'За нуждите на ЕП', style: 'subHeading', margin: [0, 0, 0, 10]});
+        definition.content.push({ text: 'З А Я В К А', style: 'title'});
+        definition.content.push({ text: query.companies, style: 'companies', margin: [25, 0, 25, 50]});
 
-        contragent.columns[0].stack.push({ text: 'Контрагент' });
-        contragent.columns[1].stack.push({ text: query.contractor });
-        contragent.columns[0].stack.push({ text: 'Основание' });
-        contragent.columns[1].stack.push({ text: query.reason });
-        contragent.columns[0].stack.push({ text: 'Дата на плащане' });
-        contragent.columns[1].stack.push({ text: payDate.toLocaleDateString('bg-BG')});
+        let main1 = {
+            columns: [
+                { text: 'За отпускане на средства за: ', width: 'auto' },
+                { text: query.title, style: 'queryTitle', width: 'auto' }
+            ],
+            columnGap: 3
+        }
+
+        definition.content.push(main1);
+
+        let activities = {
+            columns: [{
+                stack: [],
+                width: '80%'
+            }, {
+                stack: [],
+                width: '10%',
+                style: 'queryTitle'
+            }, {
+                stack: [],
+                width: '*'
+            }],
+            columnGap: 3,
+            margin: [ 15, 0, 15, 0]
+        }
+
+        let totalSumWithoutVAT = 0;
 
         query.activities.forEach((activity) => {
-            activities.table.body.push([activity.name, activity.places, activity.price])
-            totalSum += Number(activity.price);
+            totalSumWithoutVAT += Number(activity.price);
         });
 
-        totalVAT.columns[0].stack.push({ text: 'Всичко без ДДС'});
-        totalVAT.columns[1].stack.push({ text: totalSum.toString(10)});
-        totalVAT.columns[0].stack.push({ text: 'Всичко с ДДС'});
-        totalVAT.columns[1].stack.push({ text: (totalSum * 1.2).toString(10)});
+        let activitiesSummary = {
+            columns: [
+                { text: 'Всичко без ДДС: ', style: 'rightAlign', width: '80%' },
+                { text: totalSumWithoutVAT + ' лв.', width: '*', style: 'queryTitle' }
+            ],
+            columnGap: 7,
+            margin: [ 15, 10, 15, 0 ]
+        }
+
+        query.activities.forEach((activity, index) => {
+            let name = (index + 1) + '. ' +activity.company + ' - ' + activity.name;
+            activities.columns[0].stack.push(name);
+            activities.columns[1].stack.push(activity.price + ' лв.');
+            activities.columns[2].stack.push('без ДДС');
+        });
+
+        definition.content.push(activities);
+        definition.content.push(activitiesSummary);
+
+        contragent.columns[0].stack.push({ text: 'Контрагент: ' });
+        contragent.columns[1].stack.push({ text: query.contractor });
+        contragent.columns[0].stack.push({ text: 'Основание - съгласно: ' });
+        contragent.columns[1].stack.push({ text: query.reason });
+
+        definition.content.push(contragent);
+
+        let payTotal = {
+            columns: [
+                { text: 'За плащане:', style: 'totalSumRight', width: 'auto' },
+                { text: query.totalSum + ' лв.', width: '*', style: 'totalSum' }
+            ],
+            columnGap: 25,
+            margin: [ 165, 20, 15, 0 ]
+        };
+
+        definition.content.push(payTotal);
+
+        let paymentInfo = {
+            columns: [{
+                stack: [],
+                width: 'auto'
+            },{
+                stack: [],
+                width: 'auto',
+                style: 'queryTitle'
+            }],
+            columnGap: 8,
+            margin: [15, 20, 15, 0]
+        }
+
+        paymentInfo.columns[0].stack.push({ text: 'Дата на плащане: ' });
+        paymentInfo.columns[1].stack.push({ text: payDate.toLocaleDateString('bg-BG')});
+        paymentInfo.columns[0].stack.push({ text: 'Начин на плащане: ' });
+        paymentInfo.columns[1].stack.push({ text: translatePayment(query.paymentMethod)});
+
+        definition.content.push(paymentInfo);
 
         let madeBy = user.firstName + ' ' + user.lastName;
 
@@ -245,9 +329,9 @@
 
         let signatures2 = {
             columns:[{
-                text: madeBy + '          ', style: 'signatureRight'
+                text: madeBy , style: 'signatureRight'
             },{
-                text: 'Хр. Спасов           ', style: 'signatureRight'
+                text: 'Хр. Спасов', style: 'signatureRight'
             }],
             columnGap: 40,
             margin: [25, 0, 25, 35]
@@ -293,9 +377,6 @@
             margin: [25, 0, 25, 25]
         };
 
-        definition.content.push(activities);
-        definition.content.push(totalVAT);
-        definition.content.push(contragent);
         definition.content.push(signatures1, signatures2, signatures3, signatures4, signatures5, signatures6);
         definition.content.push({text: dateCreated.toLocaleDateString('bg-BG'), style: 'date', margin: 25});
 
@@ -316,10 +397,10 @@
                 let totalPrice = 0;
 
                 this.query.activities.forEach((item) => {
-                    totalPrice += Number(item.price);
+                    totalPrice += this.calculateVAT(item.price);
                 });
 
-                return totalPrice * 1.2;
+                return math.round(totalPrice, 2);
             }
         },
         methods: {
@@ -335,6 +416,10 @@
                     case 'rejected':
                         return 'red';
                 }
+            },
+            calculateVAT: function (price) {
+                let priceVAT = math.multiply(price, 1.2);
+                return math.round(priceVAT, 2);
             },
             approveQuery: function () {
                 this.query.status = 'approved';

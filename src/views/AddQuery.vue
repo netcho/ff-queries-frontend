@@ -52,7 +52,7 @@
                         <v-list>
                             <v-list-item two-line v-for="(activity, index) in activities" :key="index">
                                 <v-list-item-content>
-                                    <v-list-item-title>{{activity.company}} - {{activity.name}} price with VAT: {{activity.price * 1.2}}</v-list-item-title>
+                                    <v-list-item-title>{{activity.company}} - {{activity.name}} price with VAT: {{calculateVAT(activity.price)}}</v-list-item-title>
                                     <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                                 </v-list-item-content>
                                 <v-list-item-action>
@@ -107,6 +107,10 @@
 </template>
 
 <script>
+    import {all, create} from 'mathjs'
+
+    const math = create(all);
+
     export default {
         name: "AddQuery",
         data: function () {
@@ -144,10 +148,10 @@
                 let totalPrice = 0;
 
                 this.activities.forEach((item) => {
-                    totalPrice += Number(item.price) * 1.2;
+                    totalPrice += this.calculateVAT(item.price);
                 });
 
-                return totalPrice;
+                return math.round(totalPrice, 2);
             }
         },
         methods: {
@@ -183,6 +187,10 @@
                 this.showUpdateButton = false;
                 this.initNewActivity();
             },
+            calculateVAT: function (price) {
+                let priceVAT = math.multiply(price, 1.2);
+                return math.round(priceVAT, 2);
+            },
             saveQuery: function () {
                 let type = [];
 
@@ -197,13 +205,13 @@
 
                 this.axios.post('http://localhost:8080/query', { type: type,
                                                                             category: this.chosenCategories,
-                                                                            companies: this.chosenCompanies,
+                                                                            title: this.title,
                                                                             activities: this.activities,
                                                                             contractor: this.contragent,
                                                                             reason: this.reason,
-                                                                            title: this.title,
-                                                                            dateCreated: new Date().toISOString().substr(0, 10),
                                                                             payDate: this.payDate,
+                                                                            paymentMethod: this.paymentMethod,
+                                                                            dateCreated: new Date().toISOString().substr(0, 10),
                                                                             status: 'approved' }).
                 then(() => {
                     return this.$router.push({name: 'Queries'});

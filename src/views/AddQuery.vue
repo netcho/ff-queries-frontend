@@ -19,17 +19,13 @@
                                   v-model="chosenCategories"
                                   label="Category">
                         </v-select>
-                        <v-select :items="companies"
-                                  multiple
-                                  v-model="chosenCompanies"
-                                  label="Company">
-                        </v-select>
                         <v-text-field v-model="title" label="Title"></v-text-field>
                         <v-combobox v-model="contragent"
                                         :items="contragents"
                                         label="Contragent">
                         </v-combobox>
                         <v-text-field v-model="reason" label="Reason"></v-text-field>
+
                         <v-menu v-model="menu2"
                                 :close-on-content-click="false"
                                 :nudge-right="40"
@@ -46,22 +42,26 @@
                             </template>
                             <v-date-picker v-model="payDate" @input="menu2 = false"></v-date-picker>
                         </v-menu>
+                        <v-radio-group label="Payment method" v-model="paymentMethod" row>
+                            <v-radio label="Bank" value="bank"></v-radio>
+                            <v-radio label="In cash" value="cash"></v-radio>
+                        </v-radio-group>
                         <v-textarea v-model="notes" height="100" placeholder="Notes"></v-textarea>
                     </v-col>
                     <v-col>
                         <v-list>
-                            <v-list-item two-line v-for="item in activities" :key="item.name+item.price">
+                            <v-list-item two-line v-for="(activity, index) in activities" :key="index">
                                 <v-list-item-content>
-                                    <v-list-item-title>{{item.name}} Price with VAT: {{item.price * 1.2}}</v-list-item-title>
-                                    <v-list-item-subtitle>{{item.places}}</v-list-item-subtitle>
+                                    <v-list-item-title>{{activity.company}} - {{activity.name}} price with VAT: {{activity.price * 1.2}}</v-list-item-title>
+                                    <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                                 </v-list-item-content>
                                 <v-list-item-action>
                                     <v-btn-toggle>
-                                        <v-btn icon @click="showUpdateActivityDialog(item)">
+                                        <v-btn icon @click="showUpdateActivityDialog(index)">
                                             <v-icon>mdi-square-edit-outline</v-icon>
                                         </v-btn>
-                                        <v-btn icon @click="removeActivity(item)">
-                                            <v-icon>mdi-minus</v-icon>
+                                        <v-btn icon @click="removeActivity(index)">
+                                            <v-icon>mdi-trash-can</v-icon>
                                         </v-btn>
                                     </v-btn-toggle>
                                 </v-list-item-action>
@@ -72,14 +72,15 @@
                             </v-list-item>
                         </v-list>
 
-                        <v-dialog v-model="showAddDialog" width="500">
+                        <v-dialog v-model="showActivityDialog" width="500">
                             <template v-slot:activator="{ on }">
-                                <v-btn v-on="on">Add Item</v-btn>
+                                <v-btn v-on="on" @click="showAddButton = true">Add Item</v-btn>
                             </template>
                             <v-card>
                                 <v-card-title>Add Activity to the query</v-card-title>
                                 <v-card-text>
                                     <v-form v-model="newActivityFormValid">
+                                        <v-select required :items="companies" v-model="newActivity.company" label="Company"></v-select>
                                         <v-text-field required label="Name" v-model="newActivity.name" :rules="itemNameRules"></v-text-field>
                                         <v-text-field required label="Price" type="number" v-model="newActivity.price"></v-text-field>
                                         <v-checkbox required label="VAT Included" v-model="newActivity.priceVAT"></v-checkbox>
@@ -88,24 +89,9 @@
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn text color="primary" @click="addNewActivity" :disabled="!newActivityFormValid">Save</v-btn>
-                                    <v-btn text color="primary" @click="showAddDialog = false">Cancel</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-                        <v-dialog v-model="showUpdatePrice" width="200">
-                            <v-card>
-                                <v-card-title>Update Activity Price</v-card-title>
-                                <v-card-text>
-                                    <v-form v-model="updateActivityPriceFormValid">
-                                        <v-text-field required label="Price" type="number" v-model="updateActivityPrice"></v-text-field>
-                                        <v-checkbox required label="VAT Included" v-model="updateActivityPriceVAT"></v-checkbox>
-                                    </v-form>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn text color="primary" @click="saveActivityPrice" :disabled="!updateActivityPriceFormValid">Save</v-btn>
-                                    <v-btn text color="primary" @click="showUpdatePrice = false">Cancel</v-btn>
+                                    <v-btn text color="primary" v-if="showAddButton" @click="addActivity" :disabled="!newActivityFormValid">Add</v-btn>
+                                    <v-btn text color="primary" v-else-if="showUpdateButton" @click="updateActivity" :disabled="!newActivityFormValid">Save</v-btn>
+                                    <v-btn text color="primary" @click="closeActivityDialog">Cancel</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
@@ -133,15 +119,13 @@
                 activities: [],
                 contragent: '',
                 reason: '',
-                showAddDialog: false,
-                showUpdatePrice: false,
-                newActivity: {
-                    name: '',
-                    price: 0,
-                    priceVAT: false,
-                    places: ''
-                },
+                paymentMethod: 'bank',
+                showActivityDialog: false,
+                showAddButton: false,
+                showUpdateButton: false,
+                newActivity: {},
                 newActivityFormValid: false,
+                updateActivityIndex: null,
                 itemNameRules: [
                     v => !!v || 'Name is required'
                 ],
@@ -152,10 +136,6 @@
                 payDate: new Date().toISOString().substr(0, 10),
                 menu2: false,
                 contragents: [],
-                selectedActivity: null,
-                updateActivityPrice: 0,
-                updateActivityPriceVAT: false,
-                updateActivityPriceFormValid: false,
                 notes: ''
             }
         },
@@ -164,46 +144,44 @@
                 let totalPrice = 0;
 
                 this.activities.forEach((item) => {
-                    totalPrice += Number(item.price);
+                    totalPrice += Number(item.price) * 1.2;
                 });
 
-                return totalPrice * 1.2;
+                return totalPrice;
             }
         },
         methods: {
-            addNewActivity: function () {
-                let price = this.newActivity.priceVAT ? this.newActivity.price * 0.8 : this.newActivity.price;
-                this.activities.push({name: this.newActivity.name, price: price, places: this.newActivity.places});
+            initNewActivity: function () {
                 this.newActivity.name = '';
                 this.newActivity.price = 0;
                 this.newActivity.places = '';
-                this.showAddDialog = false;
+                this.newActivity.company = '';
+                this.newActivity.priceVAT = false;
             },
-            removeActivity: function (activity) {
-                let activityIndex = this.activities.findIndex((item) => {
-                    return activity.name === item.name;
-                });
-
-                if (activityIndex !== -1) {
-                    this.activities.splice(activityIndex, 1);
-                }
+            addActivity: function () {
+                let price = this.newActivity.priceVAT ? this.newActivity.price * 0.8 : this.newActivity.price;
+                this.activities.push({company: this.newActivity.company, name: this.newActivity.name, price: price, places: this.newActivity.places});
+                this.closeActivityDialog();
             },
-            showUpdateActivityDialog: function (activity) {
-                this.selectedActivity = activity;
-                this.updateActivityPrice = activity.price;
-                this.showUpdatePrice = true;
+            removeActivity: function (index) {
+                this.activities.splice(index, 1);
             },
-            saveActivityPrice: function () {
-                let newPrice = this.updateActivityPriceVAT ? this.updateActivityPriceFormValid * 0.8 : this.updateActivityPrice;
-                let activityIndex = this.activities.findIndex((activity) => {
-                   return this.selectedActivity.name === activity.name;
-                });
-
-                if (activityIndex !== -1) {
-                    this.activities[activityIndex].price = newPrice;
-                }
-
-                this.showUpdatePrice = false;
+            updateActivity: function () {
+                this.newActivity.price = this.newActivity.priceVAT ? this.newActivity.price * 0.8 : this.newActivity.price;
+                this.activities.splice(this.updateActivityIndex, 1, Object.assign({}, this.newActivity));
+                this.closeActivityDialog();
+            },
+            showUpdateActivityDialog: function (index) {
+                this.newActivity = Object.assign({}, this.activities[index]);
+                this.updateActivityIndex = index;
+                this.showActivityDialog = true;
+                this.showUpdateButton = true;
+            },
+            closeActivityDialog: function () {
+                this.showActivityDialog = false;
+                this.showAddButton = false;
+                this.showUpdateButton = false;
+                this.initNewActivity();
             },
             saveQuery: function () {
                 let type = [];
@@ -226,7 +204,7 @@
                                                                             title: this.title,
                                                                             dateCreated: new Date().toISOString().substr(0, 10),
                                                                             payDate: this.payDate,
-                                                                            status: 'pending' }).
+                                                                            status: 'approved' }).
                 then(() => {
                     return this.$router.push({name: 'Queries'});
                 }).
@@ -234,6 +212,9 @@
                     this.$toast.show('Created Query');
                 });
             }
+        },
+        create: function () {
+            this.initNewActivity();
         },
         mounted: function () {
             if(this.$route.params.templateQueryId) {

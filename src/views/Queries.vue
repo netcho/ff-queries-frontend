@@ -23,12 +23,6 @@
             <template v-slot:item.type="{ item }">
                 {{ item.type.reduce((acc, elem) => acc + ', ' + elem ) }}
             </template>
-            <template v-slot:item.companies="{ item }">
-                {{ item.companies.reduce((acc, elem) => acc + ', ' + elem ) }}
-            </template>
-            <template v-slot:item.sum="{ item }">
-                {{ calculateTotalPrice(item) }} lv.
-            </template>
             <template v-slot:item.status="{ item }">
                 <v-chip :color="getColor(item)">{{ item.status }}</v-chip>
             </template>
@@ -69,7 +63,7 @@
                     { text: 'Type', value: 'type' },
                     { text: 'Category', value: 'category' },
                     { text: 'Title', value: 'title' },
-                    { text: 'Sum', value: 'sum' },
+                    { text: 'Sum', value: 'totalSum' },
                     { text: 'Status', value: 'status' },
                     { text: 'Contractor', value: 'contractor' },
                     { text: 'Reason', value: 'reason' },
@@ -100,15 +94,6 @@
             },
             createFrom: function (query) {
                 this.$router.push({name: 'AddQuery', params: {templateQueryId: query._id}});
-            },
-            calculateTotalPrice: function (query) {
-                let totalPrice = 0;
-
-                query.activities.forEach((item) => {
-                    totalPrice += Number(item.price);
-                });
-
-                return totalPrice * 1.2;
             },
             getColor: function (query) {
                 switch (query.status) {

@@ -1,28 +1,42 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div id="app">
+        <component v-bind:is="layout"></component>
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+    import AppLayout from './layouts/main'
+    import SimpleLayout from './layouts/simple'
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+    export default {
+        data: () => ({
+            drawer: false,
+        }),
+        computed: {
+          layout: function () {
+              return this.$store.getters.isLoggedIn ? 'AppLayout' : 'SimpleLayout';
+          }
+        },
+        components: {
+            'AppLayout': AppLayout,
+            'SimpleLayout': SimpleLayout
+        },
+        created: function () {
+            this.$http.interceptors.response.use((response) => {
+                return response
+            }, (err) => {
+                return new Promise((resolve, reject) => {
+                    if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+                        this.$store.dispatch('logout');
+                        resolve();
+                    }
+                    reject(err);
+                });
+            });
+        }
+    }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+
 </style>

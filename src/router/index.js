@@ -49,7 +49,7 @@ const routes = [
       meta: {
         requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Queries" */ '@/views/Budgets.vue')
+      component: () => import(/* webpackChunkName: "Budgets" */ '@/views/Budgets.vue')
     }]
   }
 ];

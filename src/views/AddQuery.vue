@@ -163,15 +163,15 @@
                 this.newActivity.priceVAT = false;
             },
             addActivity: function () {
-                let price = this.newActivity.priceVAT ? this.newActivity.price * 0.8 : this.newActivity.price;
-                this.activities.push({company: this.newActivity.company, name: this.newActivity.name, price: price, places: this.newActivity.places});
+                let price = this.newActivity.priceVAT ? this.newActivity.price * 0.83 : this.newActivity.price;
+                this.activities.push({company: this.newActivity.company, name: this.newActivity.name, price: Number(price), places: this.newActivity.places});
                 this.closeActivityDialog();
             },
             removeActivity: function (index) {
                 this.activities.splice(index, 1);
             },
             updateActivity: function () {
-                this.newActivity.price = this.newActivity.priceVAT ? this.newActivity.price * 0.8 : this.newActivity.price;
+                this.newActivity.price = Number(this.newActivity.priceVAT ? this.newActivity.price * 0.83 : this.newActivity.price);
                 this.activities.splice(this.updateActivityIndex, 1, Object.assign({}, this.newActivity));
                 this.closeActivityDialog();
             },

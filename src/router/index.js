@@ -37,7 +37,7 @@ const routes = [
       },
       component: () => import(/* webpackChunkName: "Queries" */ '@/views/AddQuery.vue')
     },{
-      path: 'queries/:id',
+      path: 'query/:id',
       name: 'ViewQuery',
       meta: {
         requiresAuth: true
@@ -50,6 +50,13 @@ const routes = [
         requiresAuth: true
       },
       component: () => import(/* webpackChunkName: "Budgets" */ '@/views/Budgets.vue')
+    },{
+      path: 'budget/:week',
+      name: 'ViewBudget',
+      meta: {
+        requiresAuth: true
+      },
+      component: () => import(/* webpackChunkName: "Budgets" */ '@/views/ViewBudget.vue')
     }]
   }
 ];

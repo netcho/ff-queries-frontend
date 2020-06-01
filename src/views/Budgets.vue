@@ -1,10 +1,10 @@
 <template>
     <v-item-group>
         <v-container>
-            <v-row v-for="n in rows" :key="n" class="d-flex">
+            <v-row v-for="n in rows" :key="n" class="d-flex justify-between">
                 <v-col v-for="k in calculateColumns(n)" :key="k">
-                    <v-card height="200" width="300" tile>
-                        <v-card-title>Week {{ budgets[(n*k)-1]._id | moment('W') }}</v-card-title>
+                    <v-card height="200" width="300" tile @click="goToBudget(budgets[(n*k)-1]._id)">
+                        <v-card-title>Week {{ budgets[(n*k)-1]._id }}</v-card-title>
                         <v-card-text>Total sum for the week: {{ budgets[(n*k)-1].totalSum }}</v-card-text>
                     </v-card>
                 </v-col>
@@ -29,6 +29,9 @@
         methods: {
             calculateColumns: function (rowNumber) {
                 return math.mod(this.budgets.length, 5) ? math.chain(this.budgets.length).subtract(rowNumber * 5).mod(5).done() : 5;
+            },
+            goToBudget: function(week) {
+                this.$router.push({ name: 'ViewBudget', params: { week: week }});
             }
         },
         mounted: function () {

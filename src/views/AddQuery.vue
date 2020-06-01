@@ -74,7 +74,7 @@
 
                         <v-dialog v-model="showActivityDialog" width="500">
                             <template v-slot:activator="{ on }">
-                                <v-btn v-on="on" @click="showAddButton = true">Add Item</v-btn>
+                                <v-btn v-on="on" @click="showAddActivityDialog">Add Item</v-btn>
                             </template>
                             <v-card>
                                 <v-card-title>Add Activity to the query</v-card-title>
@@ -137,7 +137,7 @@
                 isSupport: false,
                 isInvest: false,
                 title: '',
-                payDate: new Date().toISOString().substr(0, 10),
+                payDate: null,
                 menu2: false,
                 contragents: [],
                 notes: ''
@@ -174,6 +174,11 @@
                 this.newActivity.price = Number(this.newActivity.priceVAT ? this.newActivity.price * 0.83 : this.newActivity.price);
                 this.activities.splice(this.updateActivityIndex, 1, Object.assign({}, this.newActivity));
                 this.closeActivityDialog();
+            },
+            showAddActivityDialog: function() {
+                this.newActivity = Object.assign({}, {});
+                this.showAddButton = true;
+                this.showActivityDialog = true;
             },
             showUpdateActivityDialog: function (index) {
                 this.newActivity = Object.assign({}, this.activities[index]);
@@ -221,7 +226,11 @@
                 });
             }
         },
-        create: function () {
+        created: function () {
+            let payDateValue = this.$moment();
+            payDateValue.week(payDateValue.week()+1);
+            payDateValue.isoWeekday(4);
+            this.payDate = payDateValue.format('YYYY-MM-DD');
             this.initNewActivity();
         },
         mounted: function () {

@@ -26,7 +26,7 @@
                 return response
             }, (err) => {
                 return new Promise((resolve, reject) => {
-                    if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+                    if (err.status === 401) {
                         this.$store.dispatch('logout');
                         resolve();
                     }

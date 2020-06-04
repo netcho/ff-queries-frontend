@@ -21,8 +21,11 @@
                             <v-list-item @click="generatePdf">
                                 <v-list-item-title><v-icon>mdi-printer</v-icon>Print</v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="rejectQuery">
+                            <v-list-item @click="rejectQuery" v-if="query.status !== 'rejected'">
                                 <v-list-item-title><v-icon>mdi-file-excel</v-icon>Reject</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="redactQuery" v-if="query.status === 'rejected'">
+                                <v-list-item-title><v-icon>mdi-file-document-edit</v-icon>Redact</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -55,7 +58,7 @@
                         </template>
                         <v-list-item v-for="(activity, index) in query.activities" :key="index">
                             <v-list-item-content>
-                                <v-list-item-title>{{index + 1}}. {{activity.company}} - {{activity.name}} Price with VAT: {{activity.price * 1.2}}</v-list-item-title>
+                                <v-list-item-title>{{index + 1}}. {{activity.company}} - {{activity.name}} Price with VAT: {{ calculateVAT(activity.price) }}</v-list-item-title>
                                 <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
@@ -239,17 +242,17 @@
         let activities = {
             columns: [{
                 stack: [],
-                width: '80%'
+                width: '78%'
             }, {
                 stack: [],
-                width: '10%',
+                width: '12%',
                 style: 'queryTitle'
             }, {
                 stack: [],
                 width: '*'
             }],
             columnGap: 3,
-            margin: [ 15, 0, 15, 0]
+            margin: [ 15, 0, 15, 0 ]
         }
 
         let totalSumWithoutVAT = 0;
@@ -260,7 +263,7 @@
 
         let activitiesSummary = {
             columns: [
-                { text: 'Всичко без ДДС: ', style: 'rightAlign', width: '80%' },
+                { text: 'Всичко без ДДС: ', style: 'rightAlign', width: '77%' },
                 { text: totalSumWithoutVAT + ' лв.', width: '*', style: 'queryTitle' }
             ],
             columnGap: 7,
@@ -318,67 +321,40 @@
         let madeBy = user.firstName + ' ' + user.lastName;
 
         let signatures1 = {
-            columns:[{
-                text: 'Съставил:..............................', style: 'signature'
-            },{
-                text: 'Съгласувал:..............................', style: 'signature'
-            }],
-            columnGap: 40,
-            margin: [25, 25, 25, 0]
-        };
+            stack: [
+                { text: 'Съставил:.....................................', style: 'signature', margin: [10, 50, 10, 0] },
+                { text: madeBy, style: 'signatureRight', margin: [10, 0, 90, 0] },
+                { text: 'Съгласувал:...................................', style: 'signature', margin: [10, 50, 10, 0] },
+                { text: 'Доли Николова', style: 'signatureRight', margin: [10, 0, 90, 0] },
+                { text: 'Съгласувал:...................................', style: 'signature', margin: [10, 50, 10, 0] },
+                { text: 'Директор Дирекция "Правна"', style: 'signatureRight', margin: [10, 0, 20, 0] },
+                { text: 'Съгласувал:...................................', style: 'signature', margin: [10, 50, 10, 0] },
+                { text: 'Вл. Николов', style: 'signatureRight', margin: [10, 0, 110, 0] }
+            ]
+        }
 
         let signatures2 = {
-            columns:[{
-                text: madeBy , style: 'signatureRight'
-            },{
-                text: 'Хр. Спасов', style: 'signatureRight'
-            }],
-            columnGap: 40,
-            margin: [25, 0, 25, 35]
-        };
+            stack: [
+                { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
+                { text: 'Хр. Спасов', style: 'signatureRight', margin: [10, 0, 120, 0] },
+                { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
+                { text: 'Вл. Кънчев', style: 'signatureRight', margin: [10, 0, 120, 0] },
+                { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
+                { text: 'ФСО', style: 'signatureRight', margin: [10, 0, 140, 0] }
+            ]
+        }
 
-        let signatures3 = {
-            columns:[{
-                text: 'Съгласувал:..............................', style: 'signature'
-            },{
-                text: 'Съгласувал:..............................', style: 'signature'
-            }],
-            columnGap: 40,
-            margin: [25, 35, 25, 0]
-        };
+        if (query.isUrgent) {
+            signatures2.stack.push({ text: 'Одобрил:...................................', style: 'signature', margin: [0, 50, 10, 0] })
+            signatures2.stack.push({ text: 'В. Николов', style: 'signatureRight', margin: [10, 0, 140, 0] });
+        }
 
-        let signatures4 = {
-            columns:[{
-                text: 'Директор Дирекция "Правна"', style: 'signatureRight'
-            },{
-                text: 'Директор ФСО', style: 'signatureRight'
-            }],
-            columnGap: 40,
-            margin: [25, 0, 25, 35]
-        };
+        let signatures = {
+            columns: [ signatures1, signatures2 ]
+        }
 
-        let signatures5 = {
-            columns:[{
-                text: 'Съгласувал:..............................', style: 'signature'
-            },{
-                text: 'Съгласувал:..............................', style: 'signature'
-            }],
-            columnGap: 40,
-            margin: [25, 35, 25, 0]
-        };
-
-        let signatures6 = {
-            columns:[{
-                text: 'Вл. Кънчев', style: 'signatureRight'
-            },{
-                text: 'Вл. Николов', style: 'signatureRight'
-            }],
-            columnGap: 40,
-            margin: [25, 0, 25, 25]
-        };
-
-        definition.content.push(signatures1, signatures2, signatures3, signatures4, signatures5, signatures6);
-        definition.content.push({text: dateCreated.toLocaleDateString('bg-BG'), style: 'date', margin: 25});
+        definition.content.push(signatures);
+        definition.content.push({text: dateCreated.toLocaleDateString('bg-BG'), style: 'date', margin: [10, 25, 0, 0]});
 
         return definition;
     }
@@ -421,16 +397,16 @@
                 let priceVAT = math.multiply(price, 1.2);
                 return math.round(priceVAT, 2);
             },
-            approveQuery: function () {
-                this.query.status = 'approved';
-                this.updateQuery();
-            },
             rejectQuery: function () {
                 this.query.status = 'rejected';
                 this.updateQuery();
             },
+            redactQuery: function () {
+                this.$router.push({ name: 'AddQuery', params: { templateQueryId: this.query._id, wasRejected: true} });
+            },
             updateQuery: function () {
-                this.$http.put('http://localhost:8080/query/' + this.$route.params.id, {query: this.query}).
+                delete this.query._id;
+                this.$http.put('http://localhost:8080/query/' + this.$route.params.id, this.query).
                 then((response) => {
                     if (response.status !== 200) {
                         this.fetchQuery();

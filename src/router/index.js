@@ -30,7 +30,7 @@ const routes = [
       },
       component: () => import(/* webpackChunkName: "Queries" */ '@/views/Queries.vue')
     },{
-      path: 'queries/add/:templateQueryId?',
+      path: 'queries/add/:templateQueryId?/:wasRejected?',
       name: 'AddQuery',
       meta: {
         requiresAuth: true

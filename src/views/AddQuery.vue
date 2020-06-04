@@ -7,12 +7,17 @@
                     <v-col :cols="6">
                         <v-row justify="space-around">
                             <v-checkbox v-model="isRepair"
-                                        :label="`Repair`"
-                            ></v-checkbox>
+                                        :label="`Repair`">
+                            </v-checkbox>
                             <v-checkbox v-model="isSupport"
-                                        :label="`Support`"></v-checkbox>
+                                        :label="`Support`">
+
+                            </v-checkbox>
                             <v-checkbox v-model="isInvest"
                                         :label="`Investment`">
+                            </v-checkbox>
+                            <v-checkbox v-model="isTransport"
+                                        :label="`Transport`">
                             </v-checkbox>
                         </v-row>
                         <v-select :items="categories"
@@ -25,7 +30,6 @@
                                         label="Contragent">
                         </v-combobox>
                         <v-text-field v-model="reason" label="Reason"></v-text-field>
-
                         <v-menu v-model="menu2"
                                 :close-on-content-click="false"
                                 :nudge-right="40"
@@ -42,10 +46,15 @@
                             </template>
                             <v-date-picker v-model="payDate" @input="menu2 = false"></v-date-picker>
                         </v-menu>
-                        <v-radio-group label="Payment method" v-model="paymentMethod" row>
-                            <v-radio label="Bank" value="bank"></v-radio>
-                            <v-radio label="In cash" value="cash"></v-radio>
-                        </v-radio-group>
+                        <v-row justify="space-around">
+                            <v-radio-group label="Payment method" v-model="paymentMethod" row>
+                                <v-radio label="Bank" value="bank"></v-radio>
+                                <v-radio label="In cash" value="cash"></v-radio>
+                            </v-radio-group>
+                            <v-checkbox v-model="isUrgent"
+                                        :label="`Urgent`">
+                            </v-checkbox>
+                        </v-row>
                         <v-textarea v-model="notes" height="100" placeholder="Notes"></v-textarea>
                     </v-col>
                     <v-col>
@@ -100,7 +109,8 @@
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="ma-2" tile color="indigo" dark @click="saveQuery" large>Create</v-btn>
+                <v-btn class="ma-2" tile color="indigo" dark v-if="showCreateButton" @click="saveQuery" large>Create</v-btn>
+                <v-btn class="ma-2" tile color="indigo" dark v-else @click="redactQuery" large>Save</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
@@ -111,36 +121,52 @@
 
     const math = create(all);
 
+    function constructQueryObject(type, category, title, activities, contractor, reason, paymentMethod, isUrgent, status) {
+        return Object({
+            type: type,
+            category: category,
+            title: title,
+            activities: activities,
+            contractor: contractor,
+            reason: reason,
+            paymentMethod: paymentMethod,
+            isUrgent: isUrgent,
+            status: status });
+    }
+
     export default {
         name: "AddQuery",
         data: function () {
             return {
                 valid: false,
+                activities: [],
                 companies: ['Van Holding', 'Vinterko', 'Evropa VN'],
                 categories: ['Auto', 'Clima', 'Resources', 'Kitchenware'],
-                chosenCompanies: [],
                 chosenCategories: null,
-                activities: [],
+                title: '',
                 contragent: '',
                 reason: '',
                 paymentMethod: 'bank',
-                showActivityDialog: false,
-                showAddButton: false,
-                showUpdateButton: false,
+                isRepair: false,
+                isSupport: false,
+                isInvest: false,
+                isTransport: false,
+                isUrgent: false,
+                payDate: null,
+                menu2: false,
+                contragents: [],
+                notes: '',
+                templateQuery: {},
                 newActivity: {},
                 newActivityFormValid: false,
                 updateActivityIndex: null,
                 itemNameRules: [
                     v => !!v || 'Name is required'
                 ],
-                isRepair: false,
-                isSupport: false,
-                isInvest: false,
-                title: '',
-                payDate: null,
-                menu2: false,
-                contragents: [],
-                notes: ''
+                showActivityDialog: false,
+                showAddButton: false,
+                showUpdateButton: false,
+                showCreateButton: true,
             }
         },
         computed: {
@@ -152,6 +178,23 @@
                 });
 
                 return math.round(totalPrice, 2);
+            },
+            type: function () {
+                let type = [];
+
+                if(this.isRepair)
+                    type.push('Repair');
+
+                if(this.isSupport)
+                    type.push('Support');
+
+                if(this.isInvest)
+                    type.push('Invest');
+
+                if(this.isTransport)
+                    type.push('Transport');
+
+                return type;
             }
         },
         methods: {
@@ -196,41 +239,42 @@
                 let priceVAT = math.multiply(price, 1.2);
                 return math.round(priceVAT, 2);
             },
+            calculateNextPayDate: function() {
+                let payDateValue = this.$moment();
+                payDateValue.week(payDateValue.week()+1);
+                payDateValue.isoWeekday(4);
+                this.payDate = payDateValue.format('YYYY-MM-DD');
+            },
             saveQuery: function () {
-                let type = [];
-
-                if(this.isRepair)
-                    type.push('Repair');
-
-                if(this.isSupport)
-                    type.push('Support');
-
-                if(this.isInvest)
-                    type.push('Invest');
-
-                this.axios.post('http://localhost:8080/query', { type: type,
-                                                                            category: this.chosenCategories,
-                                                                            title: this.title,
-                                                                            activities: this.activities,
-                                                                            contractor: this.contragent,
-                                                                            reason: this.reason,
-                                                                            payDate: this.payDate,
-                                                                            paymentMethod: this.paymentMethod,
-                                                                            dateCreated: new Date().toISOString().substr(0, 10),
-                                                                            status: 'approved' }).
+                let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
+                query.payDate = this.payDate;
+                query.dateCreated = new Date().toISOString().substr(0, 10);
+                this.axios.post('http://localhost:8080/query', query).
                 then(() => {
-                    return this.$router.push({name: 'Queries'});
-                }).
-                then(() => {
-                    this.$toast.show('Created Query');
+                    this.$router.push({name: 'Queries'});
+                });
+            },
+            redactQuery: function () {
+                this.$http.get('http://localhost:8080/query/' + this.$route.params.templateQueryId).
+                then((response) => {
+                    if(response.data.totalSum <= this.totalPrice) {
+                        let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
+                        let payDate = this.$moment(response.data.payDate);
+                        payDate.week(payDate.week() + 1);
+                        query.payDate = payDate.format('YYYY-MM-DD');
+                        query.dateCreated = response.data.dateCreated;
+                        this.$http.put('http://localhost:8080/query/' + this.$route.params.templateQueryId, query).
+                        then(() => this.$router.push({ name: 'Queries' }));
+                    }
+                    else {
+                        this.calculateNextPayDate();
+                        this.saveQuery();
+                    }
                 });
             }
         },
         created: function () {
-            let payDateValue = this.$moment();
-            payDateValue.week(payDateValue.week()+1);
-            payDateValue.isoWeekday(4);
-            this.payDate = payDateValue.format('YYYY-MM-DD');
+            this.calculateNextPayDate();
             this.initNewActivity();
         },
         mounted: function () {
@@ -240,14 +284,20 @@
                     this.isSupport = response.data.type.findIndex((type) => type === 'Support') !== -1;
                     this.isRepair = response.data.type.findIndex((type) => type === 'Repair') !== -1;
                     this.isInvest = response.data.type.findIndex((type) => type === 'Invest') !== -1;
-                    this.chosenCompanies = response.data.companies;
+                    this.isTransport = response.data.type.findIndex((type) => type === 'Transport') !== -1;
                     this.chosenCategories = response.data.category;
                     this.title = response.data.title;
                     this.contragent = response.data.contractor;
                     this.reason = response.data.reason;
                     this.activities = response.data.activities;
+                    this.isUrgent = response.data.isUrgent;
 
-                    this.query = response.data;
+                    this.templateQuery = response.data;
+
+                    if(this.$route.params.wasRejected) {
+                        this.showCreateButton = false;
+                        this.payDate = response.data.payDate;
+                    }
                 }).
                 catch(() => {
                     this.error = true;

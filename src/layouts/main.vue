@@ -23,7 +23,7 @@
                     <v-icon>mdi-file-table</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
-                    <v-list-item-title>Budgets</v-list-item-title>
+                    <v-list-item-title>{{$t('Budgets')}}</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
           <v-list-item @click="logout">
@@ -31,7 +31,7 @@
                   <v-icon>mdi-logout</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                  <v-list-item-title>Logout</v-list-item-title>
+                  <v-list-item-title>{{$t('Logout')}}</v-list-item-title>
               </v-list-item-content>
           </v-list-item>
         </v-list>

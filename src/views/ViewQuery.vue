@@ -1,7 +1,7 @@
 <template>
     <v-container class="pt-5">
         <section v-if="error">
-            An error occured while fetching the query
+            {{$t('ErrorOnLoad')}}
         </section>
         <section v-else>
             <v-progress-circular indeterminate color="primary" v-if="showProgressBar"></v-progress-circular>
@@ -19,13 +19,13 @@
                         </template>
                         <v-list>
                             <v-list-item @click="generatePdf">
-                                <v-list-item-title><v-icon>mdi-printer</v-icon>Print</v-list-item-title>
+                                <v-list-item-title><v-icon>mdi-printer</v-icon>{{$t('Print')}}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="rejectQuery" v-if="query.status !== 'rejected'">
-                                <v-list-item-title><v-icon>mdi-file-excel</v-icon>Reject</v-list-item-title>
+                                <v-list-item-title><v-icon>mdi-file-excel</v-icon>{{$t('Reject')}}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="redactQuery" v-if="query.status === 'rejected'">
-                                <v-list-item-title><v-icon>mdi-file-document-edit</v-icon>Redact</v-list-item-title>
+                                <v-list-item-title><v-icon>mdi-file-document-edit</v-icon>{{$t('Edit')}}</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -35,30 +35,30 @@
                         <v-list-item-icon>
                             <v-icon>mdi-layers</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Type</v-list-item-title>
+                        <v-list-item-title>{{$t('Type')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.type.reduce((acc, elem) => acc + ', ' + elem ) }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-apps</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Category</v-list-item-title>
+                        <v-list-item-title>{{$t('Category')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.category }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-selection-ellipse</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Status</v-list-item-title>
+                        <v-list-item-title>{{$t('Status')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right"><v-chip :color="getColor()">{{ query.status }}</v-chip></v-list-item-subtitle>
                     </v-list-item>
                     <v-list-group value="true" prepend-icon="mdi-hammer-screwdriver">
                         <template v-slot:activator>
-                            <v-list-item-title>Activities</v-list-item-title>
+                            <v-list-item-title>{{$t('Activities')}}</v-list-item-title>
                         </template>
                         <v-list-item v-for="(activity, index) in query.activities" :key="index">
                             <v-list-item-content>
-                                <v-list-item-title>{{index + 1}}. {{activity.company}} - {{activity.name}} Price with VAT: {{ calculateVAT(activity.price) }}</v-list-item-title>
+                                <v-list-item-title>{{index + 1}}. {{activity.company}} - {{activity.name}} {{$t('PriceVAT')}}: {{ calculateVAT(activity.price) }}</v-list-item-title>
                                 <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
@@ -67,56 +67,56 @@
                         <v-list-item-icon>
                             <v-icon>mdi-currency-usd</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Total price with VAT</v-list-item-title>
+                        <v-list-item-title>{{$t('TotalPriceVAT')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ totalPrice }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-account</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Contractor</v-list-item-title>
+                        <v-list-item-title>{{$t('Contractor')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.contractor }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-grease-pencil</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Reason</v-list-item-title>
+                        <v-list-item-title>{{$t('Reason')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.reason }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-card-bulleted</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Companies</v-list-item-title>
+                        <v-list-item-title>{{$t('Companies')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.companies }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-calendar-blank</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Pay Date</v-list-item-title>
+                        <v-list-item-title>{{$t('PayDate')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.payDate }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-cash-register</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Payment Method</v-list-item-title>
+                        <v-list-item-title>{{$t('PaymentMethod')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.paymentMethod }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-calendar</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Date created</v-list-item-title>
+                        <v-list-item-title>{{$t('DateCreated')}}</v-list-item-title>
                         <v-list-item-subtitle class="text-right">{{ query.dateCreated }}</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
                             <v-icon>mdi-note</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Notes</v-list-item-title>
+                        <v-list-item-title>{{$t('Notes')}}</v-list-item-title>
                         <v-list-item-subtitle>{{ query.notes }}</v-list-item-subtitle>
                     </v-list-item>
                 </v-list>

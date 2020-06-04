@@ -9,14 +9,14 @@
                         <v-spacer />
                     </v-toolbar>
                     <v-card-text>
-                        <v-form>
-                            <v-text-field label="Login" name="login" prepend-icon="mdi-account" type="text" v-model="username"/>
-                            <v-text-field label="Password" name="password" prepend-icon="mdi-lock" type="password" v-model="password"/>
+                        <v-form @submit="login">
+                            <v-text-field :label="$t('Username')" name="login" prepend-icon="mdi-account" type="text" v-model="username"/>
+                            <v-text-field :label="$t('Password')" name="password" prepend-icon="mdi-lock" type="password" v-model="password"/>
                         </v-form>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="primary" @click="login">Login</v-btn>
+                        <v-btn color="primary" @click="login" type="submit">{{$t('Login')}}</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-col>

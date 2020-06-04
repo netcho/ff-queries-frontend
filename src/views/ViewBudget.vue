@@ -2,7 +2,7 @@
     <v-container class="pt-5">
         <v-card class="mx-auto">
             <v-card-title>
-                Budget Week {{ $route.params.week }}
+                {{$t('BudgetWeek')}} {{ $route.params.week }}
                 <v-spacer></v-spacer>
                 <v-btn icon @click="printBudget"><v-icon>mdi-printer</v-icon></v-btn>
             </v-card-title>
@@ -23,7 +23,7 @@
         </v-card>
         <v-row class="title ma-5">
             <v-spacer></v-spacer>
-            <div>Total with VAT: {{ budget.totalSum }}</div>
+            <div>{{$t('TotalSumVAT')}}: {{ budget.totalSum }}</div>
         </v-row>
     </v-container>
 </template>
@@ -34,7 +34,6 @@
     import moment from 'moment';
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 
     function generateDefinition(budget, week, user) {
         let definition = {
@@ -218,15 +217,7 @@
         name: 'ViewBudget',
         data: function () {
             return {
-                headers: [
-                    { text: 'Title', value: 'title' },
-                    { text: 'Reason', value: 'reason' },
-                    { text: 'Places', value: 'places' },
-                    { text: 'Companies', value: 'companies' },
-                    { text: 'Contragent', value: 'contractor' },
-                    { text: 'Sum', value: 'totalSum' },
-                    { text: 'Pay Date', value: 'payDate' }
-                ],
+                headers: [],
                 budget: {},
                 error: null,
                 showProgressBar: true
@@ -242,6 +233,17 @@
             viewQuery: function (query) {
                 this.$router.push({name: 'ViewQuery', params: {id: query._id}});
             }
+        },
+        created: function () {
+            this.headers = [
+                { text: this.$t('Title'), value: 'title' },
+                { text: this.$t('Reason'), value: 'reason' },
+                { text: this.$t('Places'), value: 'places' },
+                { text: this.$t('Companies'), value: 'companies' },
+                { text: this.$t('Contractor'), value: 'contractor' },
+                { text: this.$t('Sum'), value: 'totalSum' },
+                { text: this.$t('PayDate'), value: 'payDate' }
+            ];
         },
         mounted: function () {
             this.$http.get('http://localhost:8080/budget?week=' + this.$route.params.week).

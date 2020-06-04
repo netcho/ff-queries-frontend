@@ -7,29 +7,28 @@
                     <v-col :cols="6">
                         <v-row justify="space-around">
                             <v-checkbox v-model="isRepair"
-                                        :label="`Repair`">
+                                        :label="$t('Repair')">
                             </v-checkbox>
                             <v-checkbox v-model="isSupport"
-                                        :label="`Support`">
-
+                                        :label="$t('Support')">
                             </v-checkbox>
                             <v-checkbox v-model="isInvest"
-                                        :label="`Investment`">
+                                        :label="$t('Investment')">
                             </v-checkbox>
                             <v-checkbox v-model="isTransport"
-                                        :label="`Transport`">
+                                        :label="$t('Transport')">
                             </v-checkbox>
                         </v-row>
                         <v-select :items="categories"
                                   v-model="chosenCategories"
-                                  label="Category">
+                                  :label="$t('Category')">
                         </v-select>
                         <v-text-field v-model="title" label="Title"></v-text-field>
                         <v-combobox v-model="contragent"
                                         :items="contragents"
-                                        label="Contragent">
+                                        :label="$t('Contractor')">
                         </v-combobox>
-                        <v-text-field v-model="reason" label="Reason"></v-text-field>
+                        <v-text-field v-model="reason" :label="$t('Reason')"></v-text-field>
                         <v-menu v-model="menu2"
                                 :close-on-content-click="false"
                                 :nudge-right="40"
@@ -39,7 +38,7 @@
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                         v-model="payDate"
-                                        label="Date of payment"
+                                        :label="$t('PayDate')"
                                         prepend-icon="mdi-calendar"
                                         v-on="on">
                                 </v-text-field>
@@ -47,21 +46,21 @@
                             <v-date-picker v-model="payDate" @input="menu2 = false"></v-date-picker>
                         </v-menu>
                         <v-row justify="space-around">
-                            <v-radio-group label="Payment method" v-model="paymentMethod" row>
-                                <v-radio label="Bank" value="bank"></v-radio>
-                                <v-radio label="In cash" value="cash"></v-radio>
+                            <v-radio-group :label="$t('PaymentMethod')" v-model="paymentMethod" row>
+                                <v-radio :label="$t('Bank')" value="bank"></v-radio>
+                                <v-radio :label="$t('InCash')" value="cash"></v-radio>
                             </v-radio-group>
                             <v-checkbox v-model="isUrgent"
-                                        :label="`Urgent`">
+                                        :label="$t('Urgent')">
                             </v-checkbox>
                         </v-row>
-                        <v-textarea v-model="notes" height="100" placeholder="Notes"></v-textarea>
+                        <v-textarea v-model="notes" height="100" :placeholder="$t('Notes')"></v-textarea>
                     </v-col>
                     <v-col>
                         <v-list>
                             <v-list-item two-line v-for="(activity, index) in activities" :key="index">
                                 <v-list-item-content>
-                                    <v-list-item-title>{{activity.company}} - {{activity.name}} price with VAT: {{calculateVAT(activity.price)}}</v-list-item-title>
+                                    <v-list-item-title>{{activity.company}} - {{activity.name}} {{$t('PriceVAT')}}: {{calculateVAT(activity.price)}}</v-list-item-title>
                                     <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                                 </v-list-item-content>
                                 <v-list-item-action>
@@ -77,30 +76,30 @@
                             </v-list-item>
                             <v-divider class="mb-6"></v-divider>
                             <v-list-item>
-                                Total : {{totalPrice}}
+                                {{$t('Total')}} : {{totalPrice}}
                             </v-list-item>
                         </v-list>
 
                         <v-dialog v-model="showActivityDialog" width="500">
                             <template v-slot:activator="{ on }">
-                                <v-btn v-on="on" @click="showAddActivityDialog">Add Item</v-btn>
+                                <v-btn v-on="on" @click="showAddActivityDialog">{{$t('AddActivity')}}</v-btn>
                             </template>
                             <v-card>
-                                <v-card-title>Add Activity to the query</v-card-title>
+                                <v-card-title>{{$t('AddActivityTitle')}}</v-card-title>
                                 <v-card-text>
                                     <v-form v-model="newActivityFormValid">
-                                        <v-select required :items="companies" v-model="newActivity.company" label="Company"></v-select>
-                                        <v-text-field required label="Name" v-model="newActivity.name" :rules="itemNameRules"></v-text-field>
-                                        <v-text-field required label="Price" type="number" v-model="newActivity.price"></v-text-field>
-                                        <v-checkbox required label="VAT Included" v-model="newActivity.priceVAT"></v-checkbox>
-                                        <v-text-field required label="Places" v-model="newActivity.places"></v-text-field>
+                                        <v-select required :items="companies" :label="$t('Company')" v-model="newActivity.company"></v-select>
+                                        <v-text-field required :label="$t('Title')" v-model="newActivity.name" :rules="itemNameRules"></v-text-field>
+                                        <v-text-field required :label="$t('Price')" type="number" v-model="newActivity.price"></v-text-field>
+                                        <v-checkbox required :label="$t('VATIncluded')" v-model="newActivity.priceVAT"></v-checkbox>
+                                        <v-text-field required :label="$t('Places')" v-model="newActivity.places"></v-text-field>
                                     </v-form>
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn text color="primary" v-if="showAddButton" @click="addActivity" :disabled="!newActivityFormValid">Add</v-btn>
-                                    <v-btn text color="primary" v-else-if="showUpdateButton" @click="updateActivity" :disabled="!newActivityFormValid">Save</v-btn>
-                                    <v-btn text color="primary" @click="closeActivityDialog">Cancel</v-btn>
+                                    <v-btn text color="primary" v-if="showAddButton" @click="addActivity" :disabled="!newActivityFormValid">{{$t('Add')}}</v-btn>
+                                    <v-btn text color="primary" v-else-if="showUpdateButton" @click="updateActivity" :disabled="!newActivityFormValid">{{$t('Save')}}</v-btn>
+                                    <v-btn text color="primary" @click="closeActivityDialog">{{$t('Cancel')}}</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
@@ -109,8 +108,8 @@
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="ma-2" tile color="indigo" dark v-if="showCreateButton" @click="saveQuery" large>Create</v-btn>
-                <v-btn class="ma-2" tile color="indigo" dark v-else @click="redactQuery" large>Save</v-btn>
+                <v-btn class="ma-2" tile color="indigo" dark v-if="showCreateButton" @click="saveQuery" large>{{$t('Create')}}</v-btn>
+                <v-btn class="ma-2" tile color="indigo" dark v-else @click="redactQuery" large>{{$t('Save')}}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>

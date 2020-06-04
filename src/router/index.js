@@ -71,7 +71,7 @@ router.beforeEach((to, from, next) => {
   if (lang)
     loadLanguageAsync(lang).then(() => next());
   else
-    next('/en')
+    next('/bg')
 });
 
 router.beforeEach(((to, from, next) => {

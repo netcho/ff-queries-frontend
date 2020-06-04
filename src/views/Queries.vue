@@ -2,12 +2,12 @@
     <v-container class="pt-5">
         <v-card>
             <v-card-title>
-                Queries
+                {{$t('Queries')}}
                 <v-spacer></v-spacer>
                 <v-text-field
                         v-model="search"
                         append-icon="mdi-magnify"
-                        label="Search"
+                        :label="$t('Search')"
                         single-line
                         hide-details
                 ></v-text-field>
@@ -24,7 +24,7 @@
                 {{ item.type.reduce((acc, elem) => acc + ', ' + elem ) }}
             </template>
             <template v-slot:item.status="{ item }">
-                <v-chip :color="getColor(item)">{{ item.status }}</v-chip>
+                <v-chip :color="getColor(item)">{{ $t(item.status) }}</v-chip>
             </template>
             <template v-slot:item.dateCreated="{ item }">
                 {{ new Date(item.dateCreated).toLocaleDateString() }}
@@ -59,24 +59,27 @@
         name: "Queries",
         data: function () {
             return {
-                headers:[
-                    { text: 'Type', value: 'type' },
-                    { text: 'Category', value: 'category' },
-                    { text: 'Title', value: 'title' },
-                    { text: 'Sum', value: 'totalSum' },
-                    { text: 'Status', value: 'status' },
-                    { text: 'Contractor', value: 'contractor' },
-                    { text: 'Reason', value: 'reason' },
-                    { text: 'Companies', value: 'companies' },
-                    { text: 'Pay Date', value: 'payDate' },
-                    { text: 'Date Create', value: 'dateCreated' },
-                    { text: 'Actions', value: 'actions', sortable: false },
-                ],
+                headers: [],
                 queries: [],
                 loading: true,
                 error: null,
                 search: ''
             }
+        },
+        created: function () {
+            this.headers = [
+                { text: this.$t('Type'), value: 'type' },
+                { text: this.$t('Category'), value: 'category' },
+                { text: this.$t('Title'), value: 'title' },
+                { text: this.$t('Sum'), value: 'totalSum' },
+                { text: this.$t('Status'), value: 'status' },
+                { text: this.$t('Contractor'), value: 'contractor' },
+                { text: this.$t('Reason'), value: 'reason' },
+                { text: this.$t('Companies'), value: 'companies' },
+                { text: this.$t('PayDate'), value: 'payDate' },
+                { text: this.$t('DateCreated'), value: 'dateCreated' },
+                { text: this.$t('Actions'), value: 'actions', sortable: false },
+            ]
         },
         mounted: function () {
             this.$http.get('http://localhost:8080/queries').

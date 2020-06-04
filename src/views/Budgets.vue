@@ -4,8 +4,8 @@
             <v-row v-for="n in rows" :key="n" class="d-flex justify-between">
                 <v-col v-for="k in calculateColumns(n)" :key="k">
                     <v-card height="200" width="300" tile @click="goToBudget(budgets[(n*k)-1]._id)">
-                        <v-card-title>Week {{ budgets[(n*k)-1]._id }}</v-card-title>
-                        <v-card-text>Total sum for the week: {{ budgets[(n*k)-1].totalSum }}</v-card-text>
+                        <v-card-title>{{$t('Week')}} {{ budgets[(n*k)-1]._id }}</v-card-title>
+                        <v-card-text>{{$t('TotalSumWeek')}}: {{ budgets[(n*k)-1].totalSum }}</v-card-text>
                     </v-card>
                 </v-col>
             </v-row>

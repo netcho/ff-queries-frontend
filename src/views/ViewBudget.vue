@@ -19,6 +19,9 @@
             <template v-slot:item.places="{ item }">
                 {{ item.places ? item.places.toString() : 'FF' }}
             </template>
+            <template v-slot:item.payDate="{ item }">
+                {{ item.payDate | moment('D MMM YYYY') }}
+            </template>
             </v-data-table>
         </v-card>
         <v-row class="title ma-5">
@@ -31,11 +34,10 @@
 <script>
     import * as pdfMake from 'pdfmake/build/pdfmake.js';
     import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-    import moment from 'moment';
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-    function generateDefinition(budget, week, user) {
+    function generateDefinition(budget, week, user, moment) {
         let definition = {
             content: [{
                 columns: []
@@ -191,6 +193,18 @@
         signatureColumns.stack.push({ text: '......................', style: 'row', margin: [0, 0, 0, 0] });
         signatureColumns.stack.push({ text: madeBy, style: 'name', margin: [0, 0, 0, 0]});
 
+        let dateCreated = moment();
+        dateCreated.week(week - 1);
+        dateCreated.isoWeekday(5);
+
+        let footer = {
+            columns: [
+                { text: dateCreated.format('D.MM.YYYY'), style: 'row', margin: [10, 10, 0, 0] }
+            ]
+        }
+
+        headerColumns.stack.push(footer);
+
         definition.content[0].columns.push(headerColumns);
         definition.content[0].columns.push(signatureColumns);
 
@@ -228,7 +242,7 @@
                 return getCompaniesFromActivities(query);
             },
             printBudget: function () {
-                pdfMake.createPdf(generateDefinition(this.budget, this.$route.params.week, this.$store.state.user)).open();
+                pdfMake.createPdf(generateDefinition(this.budget, this.$route.params.week, this.$store.state.user, this.$moment)).open();
             },
             viewQuery: function (query) {
                 this.$router.push({name: 'ViewQuery', params: {id: query._id}});
@@ -246,7 +260,7 @@
             ];
         },
         mounted: function () {
-            this.$http.get('http://localhost:8080/budget?week=' + this.$route.params.week).
+            this.$http.get('/api/budget?week=' + this.$route.params.week).
             then((response) => {
                 this.budget = response.data;
             }).

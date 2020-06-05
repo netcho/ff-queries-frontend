@@ -35,7 +35,7 @@
             }
         },
         mounted: function () {
-            this.$http.get('http://localhost:8080/budgets').
+            this.$http.get('/api/budgets').
             then((response) => {
                 this.budgets = response.data;
                 this.rows = math.ceil(this.budgets.length / 5);

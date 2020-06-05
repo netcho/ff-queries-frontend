@@ -23,7 +23,7 @@
                                   v-model="chosenCategories"
                                   :label="$t('Category')">
                         </v-select>
-                        <v-text-field v-model="title" label="Title"></v-text-field>
+                        <v-text-field v-model="title" :label="$t('Title')"></v-text-field>
                         <v-combobox v-model="contragent"
                                         :items="contragents"
                                         :label="$t('Contractor')">
@@ -76,7 +76,7 @@
                             </v-list-item>
                             <v-divider class="mb-6"></v-divider>
                             <v-list-item>
-                                {{$t('Total')}} : {{totalPrice}}
+                                {{$t('Total')}} : {{totalPrice}} лв с ДДС
                             </v-list-item>
                         </v-list>
 
@@ -139,7 +139,7 @@
             return {
                 valid: false,
                 activities: [],
-                companies: ['Van Holding', 'Vinterko', 'Evropa VN'],
+                companies: ['ВАН Холдинг', 'Винтерко', 'Европа ВН', 'ЕвроХарт'],
                 categories: ['Auto', 'Clima', 'Resources', 'Kitchenware'],
                 chosenCategories: null,
                 title: '',
@@ -248,13 +248,13 @@
                 let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
                 query.payDate = this.payDate;
                 query.dateCreated = new Date().toISOString().substr(0, 10);
-                this.axios.post('http://localhost:8080/query', query).
+                this.axios.post('/api/query', query).
                 then(() => {
                     this.$router.push({name: 'Queries'});
                 });
             },
             redactQuery: function () {
-                this.$http.get('http://localhost:8080/query/' + this.$route.params.templateQueryId).
+                this.$http.get('/api/query/' + this.$route.params.templateQueryId).
                 then((response) => {
                     if(response.data.totalSum <= this.totalPrice) {
                         let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
@@ -262,7 +262,7 @@
                         payDate.week(payDate.week() + 1);
                         query.payDate = payDate.format('YYYY-MM-DD');
                         query.dateCreated = response.data.dateCreated;
-                        this.$http.put('http://localhost:8080/query/' + this.$route.params.templateQueryId, query).
+                        this.$http.put('/api/query/' + this.$route.params.templateQueryId, query).
                         then(() => this.$router.push({ name: 'Queries' }));
                     }
                     else {
@@ -278,7 +278,7 @@
         },
         mounted: function () {
             if(this.$route.params.templateQueryId) {
-                this.$http.get('http://localhost:8080/query/' + this.$route.params.templateQueryId).
+                this.$http.get('/api/query/' + this.$route.params.templateQueryId).
                 then((response) => {
                     this.isSupport = response.data.type.findIndex((type) => type === 'Support') !== -1;
                     this.isRepair = response.data.type.findIndex((type) => type === 'Repair') !== -1;
@@ -305,7 +305,7 @@
                     this.showProgressBar = false;
                 });
             }
-            this.$http.get('http://localhost:8080/contragents').then((response) => {
+            this.$http.get('/api/contragents').then((response) => {
                 this.contragents = response.data;
             });
         }

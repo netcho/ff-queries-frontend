@@ -27,10 +27,10 @@
                 <v-chip :color="getColor(item)">{{ $t(item.status) }}</v-chip>
             </template>
             <template v-slot:item.dateCreated="{ item }">
-                {{ new Date(item.dateCreated).toLocaleDateString() }}
+                {{ item.dateCreated | moment('D MMM YYYY') }}
             </template>
             <template v-slot:item.payDate="{ item }">
-                {{ new Date(item.payDate).toLocaleDateString() }}
+                {{ item.payDate | moment('D MMM YYYY') }}
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="createFrom(item)">
@@ -82,7 +82,7 @@
             ]
         },
         mounted: function () {
-            this.$http.get('http://localhost:8080/queries').
+            this.$http.get('/api/queries').
             then((result) => {
                 this.queries = result.data;
             }).

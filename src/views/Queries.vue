@@ -82,7 +82,7 @@
             ]
         },
         mounted: function () {
-            this.$http.get('/api/queries').
+            this.$http.get('/queries').
             then((result) => {
                 this.queries = result.data;
             }).

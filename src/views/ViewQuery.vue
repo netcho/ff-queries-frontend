@@ -406,7 +406,7 @@
             },
             updateQuery: function () {
                 delete this.query._id;
-                this.$http.put('/api/query/' + this.$route.params.id, this.query).
+                this.$http.put('/query/' + this.$route.params.id, this.query).
                 then((response) => {
                     if (response.status !== 200) {
                         this.fetchQuery();
@@ -414,7 +414,7 @@
                 })
             },
             fetchQuery: function () {
-                this.$http.get('/api/query/' + this.$route.params.id).
+                this.$http.get('/query/' + this.$route.params.id).
                 then((response) => {
                     this.query = response.data;
                 }).

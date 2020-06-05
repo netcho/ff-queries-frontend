@@ -248,13 +248,13 @@
                 let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
                 query.payDate = this.payDate;
                 query.dateCreated = new Date().toISOString().substr(0, 10);
-                this.axios.post('/api/query', query).
+                this.axios.post('/query', query).
                 then(() => {
                     this.$router.push({name: 'Queries'});
                 });
             },
             redactQuery: function () {
-                this.$http.get('/api/query/' + this.$route.params.templateQueryId).
+                this.$http.get('/query/' + this.$route.params.templateQueryId).
                 then((response) => {
                     if(response.data.totalSum <= this.totalPrice) {
                         let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
@@ -262,7 +262,7 @@
                         payDate.week(payDate.week() + 1);
                         query.payDate = payDate.format('YYYY-MM-DD');
                         query.dateCreated = response.data.dateCreated;
-                        this.$http.put('/api/query/' + this.$route.params.templateQueryId, query).
+                        this.$http.put('/query/' + this.$route.params.templateQueryId, query).
                         then(() => this.$router.push({ name: 'Queries' }));
                     }
                     else {
@@ -278,7 +278,7 @@
         },
         mounted: function () {
             if(this.$route.params.templateQueryId) {
-                this.$http.get('/api/query/' + this.$route.params.templateQueryId).
+                this.$http.get('/query/' + this.$route.params.templateQueryId).
                 then((response) => {
                     this.isSupport = response.data.type.findIndex((type) => type === 'Support') !== -1;
                     this.isRepair = response.data.type.findIndex((type) => type === 'Repair') !== -1;
@@ -305,7 +305,7 @@
                     this.showProgressBar = false;
                 });
             }
-            this.$http.get('/api/contragents').then((response) => {
+            this.$http.get('/contragents').then((response) => {
                 this.contragents = response.data;
             });
         }

@@ -260,7 +260,7 @@
             ];
         },
         mounted: function () {
-            this.$http.get('/api/budget?week=' + this.$route.params.week).
+            this.$http.get('/budget?week=' + this.$route.params.week).
             then((response) => {
                 this.budget = response.data;
             }).

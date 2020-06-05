@@ -35,7 +35,7 @@
             }
         },
         mounted: function () {
-            this.$http.get('/api/budgets').
+            this.$http.get('/budgets').
             then((response) => {
                 this.budgets = response.data;
                 this.rows = math.ceil(this.budgets.length / 5);

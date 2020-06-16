@@ -24,7 +24,7 @@ jobs:
           release: ff-queries-frontend
           override_values:
             - key: image.tag
-              value: master-version/version
+              path: master-version/version
 
 resources:
   - name: master-branch
@@ -60,6 +60,8 @@ resources:
         /lcTIICzzj3liA5psCk/KQh+xiFOkwSGyw9fsvoSCMjiV8u8kAWFPkGrdLdDQPBr
         17jpdIA0DzYl1EknhmNcvRBfZbJPih2w4XhF8bgqZJYfzd574A==
         -----END RSA PRIVATE KEY-----
+      ignore_paths:
+      - version
       git_config:
         - name: core.bigFileThreshold
           value: 10m

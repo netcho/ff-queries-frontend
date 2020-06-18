@@ -26,8 +26,9 @@
                 return response
             }, (err) => {
                 return new Promise((resolve, reject) => {
-                    if (err.status === 401) {
+                    if (err.response.status === 401) {
                         this.$store.dispatch('logout');
+                        this.$router.push({name: 'Login'});
                         resolve();
                     }
                     reject(err);

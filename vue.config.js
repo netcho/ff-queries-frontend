@@ -14,5 +14,8 @@ module.exports = {
     }
   },
 
-  runtimeCompiler: true
+  runtimeCompiler: true,
+  devServer: {
+	  proxy: 'http://localhost:8080'
+  }
 };

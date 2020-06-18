@@ -21,7 +21,7 @@
                 class="elevation-1 mx-auto"
                 @click:row="viewQuery">
             <template v-slot:item.type="{ item }">
-                {{ item.type.reduce((acc, elem) => acc + ', ' + elem ) }}
+                {{ item.type.reduce((acc, elem) => acc + ', ' + $t(elem) ) }}
             </template>
             <template v-slot:item.status="{ item }">
                 <v-chip :color="getColor(item)">{{ $t(item.status) }}</v-chip>
@@ -39,9 +39,20 @@
                 <v-icon @click.stop="createFrom(item)">
                     mdi-content-copy
                 </v-icon>
-                <v-icon class="ml-3" @click.stop="deleteQuery(item)">
+                <v-icon class="ml-3" @click.stop="showDeleteDialog = !showDeleteDialog">
                     mdi-trash-can-outline
                 </v-icon>
+                <v-dialog v-model="showDeleteDialog" persistent max-width="290">
+                    <v-card>
+                        <v-card-title class="headline">{{$t('DeleteQueryTitle')}}</v-card-title>
+                        <v-card-text>{{$t('DeleteConfirm')}}</v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn text @click="showDeleteDialog = !showDeleteDialog">{{$t('Cancel')}}</v-btn>
+                            <v-btn text @click="deleteQuery(item)">{{$t('Delete')}}</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             </template>
             </v-data-table>
         </v-card>
@@ -205,7 +216,7 @@
         }
 
         query.activities.forEach((activity, index) => {
-            let name = (index + 1) + '. ' +activity.company + ' - ' + activity.name;
+            let name = (index + 1) + '. ' +activity.company + ' ( ' + activity.places + ' ) - ' + activity.name;
             activities.columns[0].stack.push(name);
             activities.columns[1].stack.push(activity.price + ' лв.');
             activities.columns[2].stack.push('без ДДС');
@@ -305,6 +316,7 @@
                 headers: [],
                 queries: [],
                 loading: true,
+                showDeleteDialog: false,
                 error: null,
                 search: ''
             }
@@ -344,6 +356,7 @@
                         return elem._id === query._id;
                     });
                     this.queries.splice(queryIndex, 1);
+                    this.showDeleteDialog = false;
                 })
             },
             createFrom: function (query) {

@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="valid">
         <v-card class="ma-5">
-            <v-card-title>New Query</v-card-title>
+            <v-card-title>{{$t('NewQuery')}}</v-card-title>
             <v-container>
                 <v-row class="mb-6" align="center">
                     <v-col :cols="6">
@@ -19,10 +19,10 @@
                                         :label="$t('Transport')">
                             </v-checkbox>
                         </v-row>
-                        <v-select :items="categories"
-                                  v-model="chosenCategories"
-                                  :label="$t('Category')">
-                        </v-select>
+                        <v-combobox v-model="chosenCategories"
+                                    :items="categories"
+                                    :label="$t('Category')">
+                        </v-combobox>
                         <v-text-field v-model="title" :label="$t('Title')"></v-text-field>
                         <v-combobox v-model="contragent"
                                         :items="contragents"
@@ -76,7 +76,7 @@
                             </v-list-item>
                             <v-divider class="mb-6"></v-divider>
                             <v-list-item>
-                                {{$t('Total')}} : {{totalPrice}} лв с ДДС
+                                {{$t('Total')}}: {{totalPrice}} лв. с ДДС
                             </v-list-item>
                         </v-list>
 
@@ -120,7 +120,7 @@
 
     const math = create(all);
 
-    function constructQueryObject(type, category, title, activities, contractor, reason, paymentMethod, isUrgent, status) {
+    function constructQueryObject(type, category, title, activities, contractor, reason, paymentMethod, isUrgent, notes, status) {
         return Object({
             type: type,
             category: category,
@@ -130,6 +130,7 @@
             reason: reason,
             paymentMethod: paymentMethod,
             isUrgent: isUrgent,
+            notes: notes,
             status: status });
     }
 
@@ -140,7 +141,7 @@
                 valid: false,
                 activities: [],
                 companies: ['ВАН Холдинг', 'Винтерко', 'Европа ВН', 'ЕвроХарт'],
-                categories: ['Auto', 'Clima', 'Resources', 'Kitchenware'],
+                categories: [],
                 chosenCategories: null,
                 title: '',
                 contragent: '',
@@ -245,7 +246,7 @@
                 this.payDate = payDateValue.format('YYYY-MM-DD');
             },
             saveQuery: function () {
-                let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
+                let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes,'approved');
                 query.payDate = this.payDate;
                 query.dateCreated = new Date().toISOString().substr(0, 10);
                 this.axios.post('/query', query).
@@ -257,7 +258,7 @@
                 this.$http.get('/query/' + this.$route.params.templateQueryId).
                 then((response) => {
                     if(response.data.totalSum <= this.totalPrice) {
-                        let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, 'approved');
+                        let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes, 'approved');
                         let payDate = this.$moment(response.data.payDate);
                         payDate.week(payDate.week() + 1);
                         query.payDate = payDate.format('YYYY-MM-DD');
@@ -277,6 +278,12 @@
             this.initNewActivity();
         },
         mounted: function () {
+            this.$http.get('/contragents').then((response) => {
+                this.contragents = response.data;
+            });
+            this.$http.get('/categories').then((response) => {
+                this.categories = response.data;
+            });
             if(this.$route.params.templateQueryId) {
                 this.$http.get('/query/' + this.$route.params.templateQueryId).
                 then((response) => {
@@ -290,6 +297,7 @@
                     this.reason = response.data.reason;
                     this.activities = response.data.activities;
                     this.isUrgent = response.data.isUrgent;
+                    this.notes = response.data.notes;
 
                     this.templateQuery = response.data;
 
@@ -305,9 +313,6 @@
                     this.showProgressBar = false;
                 });
             }
-            this.$http.get('/contragents').then((response) => {
-                this.contragents = response.data;
-            });
         }
     }
 </script>

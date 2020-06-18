@@ -167,7 +167,7 @@
                 this.updateQuery();
             },
             redactQuery: function () {
-                this.$router.push({ name: 'AddQuery', params: { templateQueryId: this.query._id, wasRejected: true} });
+                this.$router.push({ name: 'AddQuery', params: { templateQueryId: this.$route.params.id, wasRejected: true} });
             },
             updateQuery: function () {
                 delete this.query._id;

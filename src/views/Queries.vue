@@ -33,7 +33,10 @@
                 {{ item.payDate | moment('D MMM YYYY') }}
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="createFrom(item)">
+                <v-icon @click.stop="deleteQuery(item, $event)">
+                    mdi-trash-can-outline
+                </v-icon>
+                <v-icon @click.stop="createFrom(item, $event)">
                     mdi-content-copy
                 </v-icon>
             </template>
@@ -94,6 +97,14 @@
         methods: {
             viewQuery: function (query) {
                 this.$router.push({name: 'ViewQuery', params: {id: query._id}});
+            },
+            deleteQuery: function (query) {
+                this.$http.delete('/query/' + query._id).then(() => {
+                    let queryIndex = this.queries.findIndex((elem) => {
+                        return elem._id === query._id;
+                    });
+                    this.queries.splice(queryIndex, 1);
+                })
             },
             createFrom: function (query) {
                 this.$router.push({name: 'AddQuery', params: {templateQueryId: query._id}});

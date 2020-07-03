@@ -36,10 +36,10 @@
                 <v-icon class="mr-3" @click.stop="generatePdf(item)">
                     mdi-printer
                 </v-icon>
-                <v-icon @click.stop="createFrom(item)">
+                <v-icon @click.stop="createFrom(item)" v-if="$can('create', 'Query')">
                     mdi-content-copy
                 </v-icon>
-                <v-icon class="ml-3" @click.stop="showDeleteDialog = !showDeleteDialog">
+                <v-icon class="ml-3" @click.stop="showDeleteDialog = !showDeleteDialog" v-if="$can('delete', 'Query')">
                     mdi-trash-can-outline
                 </v-icon>
                 <v-dialog v-model="showDeleteDialog" persistent max-width="290">
@@ -65,6 +65,7 @@
                 right
                 absolute
                 link
+                v-if="$can('create', 'Query')"
                 :to="{ name: 'AddQuery'}">
             <v-icon>mdi-plus</v-icon>
         </v-btn>

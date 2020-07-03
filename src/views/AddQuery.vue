@@ -1,34 +1,37 @@
 <template>
-    <v-form v-model="valid">
+    <v-form v-model="valid" ref="addForm">
         <v-card class="ma-5">
             <v-card-title>{{$t('NewQuery')}}</v-card-title>
             <v-container>
                 <v-row class="mb-6" align="center">
                     <v-col :cols="6">
-                        <v-row justify="space-around">
-                            <v-checkbox v-model="isRepair"
-                                        :label="$t('Repair')">
-                            </v-checkbox>
-                            <v-checkbox v-model="isSupport"
-                                        :label="$t('Support')">
-                            </v-checkbox>
-                            <v-checkbox v-model="isInvest"
-                                        :label="$t('Investment')">
-                            </v-checkbox>
-                            <v-checkbox v-model="isTransport"
-                                        :label="$t('Transport')">
-                            </v-checkbox>
-                        </v-row>
+                        <v-chip-group multiple active-class="primary--text" v-model="type">
+                            <v-chip :value="'Repair'">{{$t('Repair')}}</v-chip>
+                            <v-chip :value="'Support'">{{$t('Support')}}</v-chip>
+                            <v-chip :value="'Investment'">{{$t('Investment')}}</v-chip>
+                            <v-chip :value="'Transport'">{{$t('Transport')}}</v-chip>
+                        </v-chip-group>
                         <v-combobox v-model="chosenCategories"
                                     :items="categories"
                                     :label="$t('Category')">
                         </v-combobox>
-                        <v-text-field v-model="title" :label="$t('Title')"></v-text-field>
+                        <v-text-field v-model="title"
+                                      :label="$t('Title')"
+                                      :error-messages="titleErrors"
+                                      @input="$v.title.$touch()"
+                                      @blur="$v.title.$touch()"></v-text-field>
                         <v-combobox v-model="contragent"
                                         :items="contragents"
-                                        :label="$t('Contractor')">
+                                        :label="$t('Contractor')"
+                                        :error-messages="contragentErrors"
+                                        @input="$v.contragent.$touch()"
+                                        @blur="$v.contragent.$touch()">
                         </v-combobox>
-                        <v-text-field v-model="reason" :label="$t('Reason')"></v-text-field>
+                        <v-text-field v-model="reason"
+                                      :label="$t('Reason')"
+                                      :error-messages="reasonErrors"
+                                      @input="$v.reason.$touch()"
+                                      @blur="$v.reason.$touch()"></v-text-field>
                         <v-menu v-model="menu2"
                                 :close-on-content-click="false"
                                 :nudge-right="40"
@@ -108,15 +111,16 @@
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="ma-2" tile color="indigo" dark v-if="showCreateButton" @click="saveQuery" large>{{$t('Create')}}</v-btn>
-                <v-btn class="ma-2" tile color="indigo" dark v-else @click="redactQuery" large>{{$t('Save')}}</v-btn>
+                <v-btn class="ma-2" tile large color="indigo" dark v-if="showCreateButton" :disabled="!valid || activities.length === 0" @click="saveQuery">{{$t('Create')}}</v-btn>
+                <v-btn class="ma-2" tile large color="indigo" dark v-else :disabled="!valid || activities.length === 0" @click="redactQuery">{{$t('Save')}}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
 </template>
 
 <script>
-    import {all, create} from 'mathjs'
+    import { all, create } from 'mathjs'
+    import { required, minLength } from 'vuelidate/lib/validators'
 
     const math = create(all);
 
@@ -138,10 +142,11 @@
         name: "AddQuery",
         data: function () {
             return {
-                valid: false,
+                valid: true,
                 activities: [],
                 companies: ['ВАН Холдинг', 'Винтерко', 'Европа ВН', 'ЕвроХарт'],
                 categories: [],
+                type: [],
                 chosenCategories: null,
                 title: '',
                 contragent: '',
@@ -169,6 +174,20 @@
                 showCreateButton: true,
             }
         },
+        validations: {
+            title: {
+                required,
+                minLength: minLength(4)
+            },
+            contragent: {
+                required,
+                minLength: minLength(6)
+            },
+            reason: {
+                required,
+                minLength: minLength(10)
+            }
+        },
         computed: {
             totalPrice: function () {
                 let totalPrice = 0;
@@ -179,22 +198,26 @@
 
                 return math.round(totalPrice, 2);
             },
-            type: function () {
-                let type = [];
-
-                if(this.isRepair)
-                    type.push('Repair');
-
-                if(this.isSupport)
-                    type.push('Support');
-
-                if(this.isInvest)
-                    type.push('Invest');
-
-                if(this.isTransport)
-                    type.push('Transport');
-
-                return type;
+            titleErrors: function () {
+                const errors = [];
+                if (!this.$v.title.$dirty)
+                    return errors;
+                !this.$v.title.required && errors.push(this.$t('TitleRequired'));
+                return errors;
+            },
+            contragentErrors: function () {
+                const errors = [];
+                if (!this.$v.contragent.$dirty)
+                    return errors;
+                !this.$v.contragent.required && errors.push(this.$t('ContragentRequired'));
+                return errors;
+            },
+            reasonErrors: function () {
+                const errors = [];
+                if (!this.$v.reason.$dirty)
+                    return errors;
+                !this.$v.reason.required && errors.push(this.$t('ReasonRequired'));
+                return errors;
             }
         },
         methods: {

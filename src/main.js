@@ -5,12 +5,17 @@ import vuetify from '@/plugins/vuetify'
 import axios from '@/plugins/axios'
 import { i18n } from '@/plugins/i18n'
 import Vuelidate from 'vuelidate'
+import { abilitiesPlugin } from '@casl/vue';
 import App from '@/App'
+import 'vuetify/dist/vuetify.min.css'
 
 Vue.config.productionTip = false;
 
 Vue.use(require('vue-moment'));
 Vue.use(Vuelidate);
+Vue.use(abilitiesPlugin);
+
+const ability = store.getters.ability;
 
 let instance = new Vue({
   vuetify,
@@ -18,6 +23,7 @@ let instance = new Vue({
   axios,
   i18n,
   store,
+  ability,
   render: h => h(App)
 });
 

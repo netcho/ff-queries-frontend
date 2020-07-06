@@ -69,6 +69,7 @@
                 :to="{ name: 'AddQuery'}">
             <v-icon>mdi-plus</v-icon>
         </v-btn>
+        {{$ability.rules}}
     </v-container>
 </template>
 

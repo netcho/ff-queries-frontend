@@ -13,9 +13,7 @@ Vue.config.productionTip = false;
 
 Vue.use(require('vue-moment'));
 Vue.use(Vuelidate);
-Vue.use(abilitiesPlugin);
-
-const ability = store.getters.ability;
+Vue.use(abilitiesPlugin, store.getters.ability);
 
 let instance = new Vue({
   vuetify,
@@ -23,7 +21,6 @@ let instance = new Vue({
   axios,
   i18n,
   store,
-  ability,
   render: h => h(App)
 });
 

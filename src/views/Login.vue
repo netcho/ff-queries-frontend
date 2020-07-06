@@ -35,6 +35,7 @@
         methods: {
             login: function () {
                 this.$store.dispatch('login', {username: this.username, password: this.password}).then(() => {
+                    this.$ability.update(this.$store.state.rules);
                     this.$router.push({name: 'Queries'})
                 }, (err) => {
                     if (err.status === 401) {

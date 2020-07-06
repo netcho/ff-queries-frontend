@@ -67,6 +67,7 @@
     methods: {
         logout: function () {
             this.$store.dispatch('logout').then(() => {
+                this.$ability.update(this.$store.state.rules);
                 this.$router.push({ name: 'Login'});
             });
         }

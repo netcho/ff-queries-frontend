@@ -5,7 +5,7 @@
         </section>
         <section v-else>
             <v-progress-circular indeterminate color="primary" v-if="showProgressBar"></v-progress-circular>
-            <v-card class="mx-auto" max-width="600" v-else>
+            <v-card class="mx-auto" max-width="800" v-else>
                 <v-card-title class="indigo white--text">
                     <span class="headline">
                         {{ query.title }}
@@ -33,7 +33,9 @@
                             <v-icon>mdi-layers</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>{{$t('Type')}}</v-list-item-title>
-                        <v-list-item-subtitle class="text-right">{{ query.type.reduce((acc, elem) => acc + ', ' + elem ) }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-right">
+                            {{ translateType() }}
+                        </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>
@@ -161,6 +163,19 @@
             calculateVAT: function (price) {
                 let priceVAT = math.multiply(price, 1.2);
                 return math.round(priceVAT, 2);
+            },
+            translateType: function () {
+                let type = '';
+
+                this.query.type.forEach((elem, index, array) => {
+                    if( index > 0 && index < array.length) {
+                        type += ', ';
+                    }
+
+                    type += this.$t(elem);
+                });
+
+                return type;
             },
             rejectQuery: function () {
                 this.query.status = 'rejected';

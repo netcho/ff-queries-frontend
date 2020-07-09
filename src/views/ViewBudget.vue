@@ -20,7 +20,7 @@
                 {{ item.places ? item.places.toString() : 'FF' }}
             </template>
             <template v-slot:item.payDate="{ item }">
-                {{ item.payDate | moment('D MMM YYYY') }}
+                {{ item.payDate | moment('ll') }}
             </template>
             </v-data-table>
         </v-card>
@@ -34,92 +34,101 @@
 <script>
     import * as pdfMake from 'pdfmake/build/pdfmake.js';
     import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+    import moment from 'moment';
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-    function generateDefinition(budget, week, user, moment) {
+    function generateQueryRows(queries) {
+        let segment = {
+            table: {
+                widths: [ 200, 100, 60, 70, 105, 34, 30, 35],
+                body: []
+            }
+        }
+
+        queries.forEach((query) => {
+            let row = [];
+            row.push({ text: query.title, style: 'row' });
+            row.push({ text: query.reason, style: 'row' });
+            row.push({ text: query.places ? query.places.toString() : 'ФФ', style: 'row' });
+            row.push({ text: getCompaniesFromActivities(query), style: 'row' });
+            row.push({ text: query.contractor, style: 'row' });
+            let payDate = moment(query.payDate);
+            row.push({ text: query.totalSum, style: 'sumCell' });
+            row.push({ text: payDate.format('D MMM'), style: 'row' });
+            row.push({ text: 'фактури', style: 'row' });
+            segment.table.body.push(row);
+        });
+
+        return segment;
+    }
+
+    function generateSubTotal(queries) {
+        let price = 0;
+
+        queries.forEach((query) => {
+            price += Number(query.totalSum);
+        });
+
+        return {
+            table: {
+                widths: [570, 118],
+                body: [
+                    [
+                        { text: 'Общо', style: 'rowRightBold' },
+                        { text: price + ' лв.', style: 'rowRightBold', margin: [ 0, 0, 70, 0] }
+                    ]
+                ]
+            }
+        }
+    }
+
+    function generateDefinition(budget, week, user) {
         let definition = {
             content: [{
                 columns: []
             }],
             styles: {
                 title: {
-                    fontSize: 9,
+                    fontSize: 7,
                     bold: true,
                     alignment: 'center'
+                },
+                titleLeft: {
+                    fontSize: 7,
+                    bold: true,
+                    alignment: 'left'
                 },
                 row: {
-                    fontSize: 9
+                    fontSize: 7
                 },
-                name: {
-                    fontSize: 9,
-                    italics: true
-                },
-                sumCell: {
-                    fontSize: 9,
-                    alignment: 'right'
-                },
-                titleSmall: {
-                    fontSize: 20,
-                    alignment: 'center'
-                },
-                subHeading: {
-                    fontSize: 15,
-                    bold: true,
-                    alignment: 'right'
-                },
-                companies: {
-                    fontSize: 14,
-                    alignment: 'center'
-                },
-                center: {
-                    alignment: 'center'
-                },
-                names: {
-                    fontSize: 17
-                },
-                signature: {
-                    //fontSize: 15,
-                    italics: true
-                },
-                signatureRight: {
-                    //fontSize: 15,
-                    italics: true,
-                    alignment: 'right'
-                },
-                date: {
-                    fontSize: 12,
-                    italics: true
-                },
-                bold: {
-                    bold: true
-                },
-                rightAlign: {
-                    alignment: 'right'
-                },
-                rightAlignBold: {
+                rowRightBold: {
+                    fontSize: 7,
                     alignment: 'right',
                     bold: true
                 },
-                totalSumRight: {
-                    fontSize: 15,
-                    bold: true,
-                    alignment: 'right'
-                },
-                totalSum: {
-                    fontSize: 15,
+                rowBold: {
+                    fontSize: 7,
                     bold: true
+                },
+                name: {
+                    fontSize: 7,
+                    italics: true
+                },
+                sumCell: {
+                    fontSize: 7,
+                    alignment: 'right'
                 }
             },
             pageSize: 'A4',
             pageOrientation: 'landscape',
-            pageMargins: [ 10, 10, 10, 10 ]
+            pageMargins: [ 15, 15, 15, 15 ]
         }
 
         let headerColumns = {
             stack: [{
                 table: {
-                    widths: [560, 45, 50, 50],
+                    widths: [570, 35, 30, 35],
                     body: [
                         [ { text: 'Договорни, фактурирани и очаквани плащания от дирекция "ЕП"', style: 'title' },
                           { text: new Date().getFullYear(), style: 'title' },
@@ -133,7 +142,7 @@
 
         let subheaderColumns = {
             table: {
-                widths: [ 190, 100, 60, 70, 105, 44, 50, 50],
+                widths: [ 200, 100, 60, 70, 105, 34, 30, 35],
                 body: [
                     [ { text: 'Основание', style: 'title' },
                       { text: '№ по ред плащане - чл., ал. от договора', style: 'title' },
@@ -148,58 +157,91 @@
             }
         }
 
-        budget.queries.forEach((query) => {
-            let row = [];
-            row.push({ text: query.title, style: 'row' });
-            row.push({ text: query.reason, style: 'row' });
-            row.push({ text: query.places ? query.places.toString() : 'ФФ', style: 'row' });
-            row.push({ text: getCompaniesFromActivities(query), style: 'row' });
-            row.push({ text: query.contractor, style: 'row' });
-            let payDate = moment(query.payDate);
-            row.push({ text: query.totalSum, style: 'sumCell' });
-            row.push({ text: payDate.format('D MMM'), style: 'row' });
-            row.push({ text: 'фактури', style: 'row' });
-            subheaderColumns.table.body.push(row);
-        });
-
         headerColumns.stack.push(subheaderColumns);
+
+        let autoQueries = budget.queries.filter((query) => { return query.type === 'Transport'});
+
+        if (autoQueries.length) {
+            let autoSubheader = {
+                table: {
+                    widths: [697],
+                    body: [
+                        [
+                            { text: 'АВТОПАРК', style: 'titleLeft'}
+                        ]
+                    ]
+                }
+            }
+            headerColumns.stack.push(autoSubheader);
+            headerColumns.stack.push(generateQueryRows(autoQueries));
+            headerColumns.stack.push(generateSubTotal(autoQueries));
+        }
+
+        let supportQueries = budget.queries.filter((query) => { return query.type !== 'Transport'});
+
+        if (supportQueries.length) {
+            let supportSubheader = {
+                table: {
+                    widths: [697],
+                    body: [
+                        [
+                            { text: 'ПОДДРЪЖКА', style: 'titleLeft'}
+                        ]
+                    ]
+                }
+            }
+            headerColumns.stack.push(supportSubheader);
+            headerColumns.stack.push(generateQueryRows(supportQueries));
+            headerColumns.stack.push(generateSubTotal(supportQueries));
+        }
 
         let signatureColumns = {
             stack: [
                 { text: 'Одобрил', style: 'row', margin: [5, 0, 0, 30] },
-                { text: '......................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
                 { text: 'В. Николов', style: 'row', margin: [5, 0, 0, 0] },
                 { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
-                { text: '......................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
                 { text: 'Вл. Николов', style: 'name', margin: [5, 0, 0, 0] },
                 { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
-                { text: '......................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: 'Доли Николова', style: 'name', margin: [5, 0, 0, 0] },
+                { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: 'Ян. Стойчев', style: 'name', margin: [5, 0, 0, 0] },
+                { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: 'В. Божева', style: 'name', margin: [5, 0, 0, 0] },
+                { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
                 { text: 'Вл. Кънчев', style: 'name', margin: [5, 0, 0, 0] },
                 { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
-                { text: '......................', style: 'row', margin: [5, 0, 0, 0] },
-                { text: 'Дирекция "Правна"', style: 'name', margin: [5, 0, 0, 0] },
-                { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
-                { text: '......................', style: 'row', margin: [5, 0, 0, 0] },
-                { text: 'ФСО', style: 'name', margin: [5, 0, 0, 0] },
-                { text: 'Съгласувал:', style: 'row', margin: [5, 5, 0, 30] },
-                { text: '......................', style: 'row', margin: [5, 0, 0, 0] },
+                { text: '......................................................', style: 'row', margin: [5, 0, 0, 0] },
                 { text: 'Хр. Спасов', style: 'name', margin: [5, 0, 0, 0] }
             ]
         }
 
         let madeBy = user.firstName.substring(0, 1) + ' ' + user.lastName;
 
-        signatureColumns.stack.push({ text: 'Изготвил', style: 'row', margin: [0, 5, 0, 35]});
-        signatureColumns.stack.push({ text: '......................', style: 'row', margin: [0, 0, 0, 0] });
-        signatureColumns.stack.push({ text: madeBy, style: 'name', margin: [0, 0, 0, 0]});
+        signatureColumns.stack.push({ text: 'Изготвил', style: 'row', margin: [5, 5, 0, 35]});
+        signatureColumns.stack.push({ text: '......................................................', style: 'row', margin: [5, 0, 0, 0] });
+        signatureColumns.stack.push({ text: madeBy, style: 'name', margin: [5, 0, 0, 0]});
 
         let dateCreated = moment();
         dateCreated.week(week - 1);
         dateCreated.isoWeekday(5);
 
+        let total = 0;
+
+        budget.queries.forEach((query) => {
+            total += Number(query.totalSum);
+        });
+
         let footer = {
             columns: [
-                { text: dateCreated.format('D.MM.YYYY'), style: 'row', margin: [10, 10, 0, 0] }
+                { text: dateCreated.format('D.MM.YYYY'), style: 'row', margin: [10, 10, 0, 0] },
+                { text: 'Седмичен бюджет №' + week, style: 'rowBold', margin: [10, 10, 10, 0] },
+                { text: 'Всико с ДДС:' + total + ' лв.', style: 'rowBold', margin: [ 90, 3, 10, 0] }
             ]
         }
 
@@ -242,7 +284,7 @@
                 return getCompaniesFromActivities(query);
             },
             printBudget: function () {
-                pdfMake.createPdf(generateDefinition(this.budget, this.$route.params.week, this.$store.state.user, this.$moment)).open();
+                pdfMake.createPdf(generateDefinition(this.budget, this.$route.params.week, this.$store.state.user)).open();
             },
             viewQuery: function (query) {
                 this.$router.push({name: 'ViewQuery', params: {id: query._id}});

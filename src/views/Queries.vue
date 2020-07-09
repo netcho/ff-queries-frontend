@@ -18,30 +18,33 @@
                 :items-per-page="20"
                 :loading="loading"
                 :search="search"
+                calculate-widths
                 class="elevation-1 mx-auto"
                 @click:row="viewQuery">
             <template v-slot:item.type="{ item }">
-                {{ item.type.reduce((acc, elem) => acc + ', ' + $t(elem) ) }}
+                {{ translateType(item) }}
             </template>
             <template v-slot:item.status="{ item }">
                 <v-chip :color="getColor(item)">{{ $t(item.status) }}</v-chip>
             </template>
             <template v-slot:item.dateCreated="{ item }">
-                {{ item.dateCreated | moment('D MMM YYYY') }}
+                {{ item.dateCreated | moment('ll') }}
             </template>
             <template v-slot:item.payDate="{ item }">
-                {{ item.payDate | moment('D MMM YYYY') }}
+                {{ item.payDate | moment('ll') }}
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon class="mr-3" @click.stop="generatePdf(item)">
-                    mdi-printer
-                </v-icon>
-                <v-icon @click.stop="createFrom(item)" v-if="$can('create', 'Query')">
-                    mdi-content-copy
-                </v-icon>
-                <v-icon class="ml-3" @click.stop="showDeleteDialog = !showDeleteDialog" v-if="$can('delete', 'Query')">
-                    mdi-trash-can-outline
-                </v-icon>
+                <v-row justify="space-around" class="flex-nowrap">
+                    <v-icon class="mr-3" @click.stop="generatePdf(item)">
+                        mdi-printer
+                    </v-icon>
+                    <v-icon @click.stop="createFrom(item)" v-if="$can('create', 'Query')">
+                        mdi-content-copy
+                    </v-icon>
+                    <v-icon class="ml-3" @click.stop="showDeleteDialog = !showDeleteDialog" v-if="$can('delete', 'Query')">
+                        mdi-trash-can-outline
+                    </v-icon>
+                </v-row>
                 <v-dialog v-model="showDeleteDialog" persistent max-width="290">
                     <v-card>
                         <v-card-title class="headline">{{$t('DeleteQueryTitle')}}</v-card-title>
@@ -92,61 +95,56 @@
             content: [],
             styles: {
                 title: {
-                    fontSize: 28,
+                    fontSize: 24,
                     bold: true,
                     alignment: 'center'
                 },
-                titleSmall: {
-                    fontSize: 20,
-                    alignment: 'center'
-                },
                 subHeading: {
-                    fontSize: 15,
+                    fontSize: 11,
                     bold: true,
                     alignment: 'right'
                 },
                 companies: {
-                    fontSize: 14,
+                    fontSize: 10,
                     alignment: 'center'
-                },
-                center: {
-                    alignment: 'center'
-                },
-                names: {
-                    fontSize: 17
                 },
                 signature: {
-                    fontSize: 11,
+                    fontSize: 9,
                     italics: true
                 },
                 signatureRight: {
-                    fontSize: 10,
+                    fontSize: 8,
                     italics: true,
                     alignment: 'right'
                 },
                 date: {
-                    fontSize: 10,
+                    fontSize: 9,
                     italics: true,
                     alignment: 'right'
                 },
-                queryTitle: {
-                    bold: true,
-                    //alignment: 'left'
+                mainText: {
+                    fontSize: 10
+                },
+                mainTextBold: {
+                    fontSize: 10,
+                    bold: true
                 },
                 rightAlign: {
-                    alignment: 'right'
+                    alignment: 'right',
+                    fontSize: 10
                 },
                 rightAlignBold: {
+                    fontSize: 10,
                     alignment: 'right',
                     bold: true
                 },
                 totalSumRight: {
-                    fontSize: 15,
+                    fontSize: 13,
                     bold: true,
                     alignment: 'right'
                 },
                 totalSum: {
-                    fontSize: 15,
+                    fontSize: 13,
                     bold: true
                 }
             },
@@ -154,31 +152,17 @@
             pageMargins: [ 30, 20, 30, 20 ]
         };
 
-        let contragent = {
-            columns: [{
-                stack: [],
-                width: 'auto'
-            },{
-                stack: [],
-                width: 'auto',
-                style: 'queryTitle'
-            }],
-            columnGap: 8,
-            margin: [15, 20, 15, 0]
-        };
-
-
         let payDate = new Date(query.payDate);
         let dateCreated = new Date(query.dateCreated);
 
         definition.content.push({ text: 'За нуждите на ЕП', style: 'subHeading', margin: [0, 0, 0, 10]});
         definition.content.push({ text: 'З А Я В К А', style: 'title'});
-        definition.content.push({ text: query.companies, style: 'companies', margin: [25, 0, 25, 50]});
+        definition.content.push({ text: query.companies, style: 'companies', margin: [25, 0, 25, 20]});
 
         let main1 = {
             columns: [
-                { text: 'За отпускане на средства за: ', width: 'auto' },
-                { text: query.title, style: 'queryTitle', width: 'auto' }
+                { text: 'За отпускане на средства за: ', style: 'mainText', width: 'auto' },
+                { text: query.title, style: 'mainTextBold', width: 'auto' }
             ],
             columnGap: 3
         }
@@ -188,14 +172,16 @@
         let activities = {
             columns: [{
                 stack: [],
-                width: '78%'
+                width: '78%',
+                style: 'mainText'
             }, {
                 stack: [],
                 width: '12%',
-                style: 'queryTitle'
+                style: 'mainTextBold'
             }, {
                 stack: [],
-                width: '*'
+                width: '*',
+                style: 'mainText'
             }],
             columnGap: 3,
             margin: [ 15, 0, 15, 0 ]
@@ -210,14 +196,17 @@
         let activitiesSummary = {
             columns: [
                 { text: 'Всичко без ДДС: ', style: 'rightAlign', width: '77%' },
-                { text: totalSumWithoutVAT + ' лв.', width: '*', style: 'queryTitle' }
+                { text: totalSumWithoutVAT + ' лв.',  style: 'mainTextBold', width: '*' }
             ],
             columnGap: 7,
             margin: [ 15, 10, 15, 0 ]
         }
 
         query.activities.forEach((activity, index) => {
-            let name = (index + 1) + '. ' +activity.company + ' ( ' + activity.places + ' ) - ' + activity.name;
+            let name = (index + 1) + '. ' +activity.company + ' - ' + activity.name;
+            if (activity.places && activity.places.length) {
+                name += ' ' + activity.places;
+            }
             activities.columns[0].stack.push(name);
             activities.columns[1].stack.push(activity.price + ' лв.');
             activities.columns[2].stack.push('без ДДС');
@@ -225,6 +214,20 @@
 
         definition.content.push(activities);
         definition.content.push(activitiesSummary);
+
+        let contragent = {
+            columns: [{
+                stack: [],
+                width: 'auto',
+                style: 'mainText'
+            },{
+                stack: [],
+                width: 'auto',
+                style: 'mainTextBold'
+            }],
+            columnGap: 8,
+            margin: [15, 20, 15, 0]
+        };
 
         contragent.columns[0].stack.push({ text: 'Контрагент: ', margin: [ 0, 0, 0, 10 ] });
         contragent.columns[1].stack.push({ text: query.contractor, margin: [ 0, 0, 0, 10 ] });
@@ -247,11 +250,12 @@
         let paymentInfo = {
             columns: [{
                 stack: [],
-                width: 'auto'
+                width: 'auto',
+                style: 'mainText'
             },{
                 stack: [],
                 width: 'auto',
-                style: 'queryTitle'
+                style: 'mainTextBold'
             }],
             columnGap: 8,
             margin: [15, 20, 15, 0]
@@ -269,29 +273,29 @@
         let signatures1 = {
             stack: [
                 { text: 'Съставил:.....................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: madeBy, style: 'signatureRight', margin: [0, 0, 40, 0] },
+                { text: madeBy, style: 'signatureRight', margin: [0, 0, 60, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Доли Николова/', style: 'signatureRight', margin: [0, 0, 30, 0] },
+                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Вл. Николов/', style: 'signatureRight', margin: [0, 0, 40, 0] }
+                { text: '/Вл. Николов/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 
         let signatures2 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Хр. Спасов/', style: 'signatureRight', margin: [0, 0, 45, 0] },
+                { text: '/Хр. Спасов/', style: 'signatureRight', margin: [0, 0, 65, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Директор Дирекция "Правна"/', style: 'signatureRight', margin: [10, 0, 20, 0] },
+                { text: '/Ян. Стойчев/', style: 'signatureRight', margin: [10, 0, 60, 0] },
             ]
         }
 
         let signatures3 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Вл. Кънчев/', style: 'signatureRight', margin: [0, 0, 30, 0] },
+                { text: '/Вл. Кънчев/', style: 'signatureRight', margin: [0, 0, 60, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/отдел ФСО/', style: 'signatureRight', margin: [0, 0, 40, 0] }
+                { text: '/Доли Николова/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 
@@ -375,6 +379,19 @@
                     case 'rejected':
                         return 'red';
                 }
+            },
+            translateType: function (query) {
+                let type = '';
+
+                query.type.forEach((elem, index) => {
+                    if( index > 0 && index < query.type.length) {
+                        type += ', ';
+                    }
+
+                    type += this.$t(elem);
+                });
+
+                return type;
             }
         }
     }

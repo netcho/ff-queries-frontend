@@ -144,7 +144,7 @@
             return {
                 valid: true,
                 activities: [],
-                companies: ['ВАН Холдинг', 'Винтерко', 'Европа ВН', 'ЕвроХарт'],
+                companies: ['ВАН Холдинг ЕООД', 'Винтерко-БГ ЕООД', 'Европа-ВН ЕООД', 'ЕвроХарт ЕООД'],
                 categories: [],
                 type: [],
                 chosenCategories: null,

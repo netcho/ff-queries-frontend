@@ -4,7 +4,6 @@
             <v-card-title>
                 {{$t('BudgetWeek')}} {{ $route.params.week }}
                 <v-spacer></v-spacer>
-                <v-btn icon @click="printBudget"><v-icon>mdi-printer</v-icon></v-btn>
             </v-card-title>
             <v-data-table
                     :headers="headers"
@@ -26,8 +25,20 @@
         </v-card>
         <v-row class="title ma-5">
             <v-spacer></v-spacer>
-            <div>{{$t('TotalSumVAT')}}: {{ budget.totalSum }}</div>
+            <div class="mr-11">{{$t('TotalSumVAT')}}: {{ budget.totalSum }}</div>
         </v-row>
+        <v-btn
+                color="pink"
+                dark
+                large
+                fab
+                bottom
+                right
+                absolute
+                link
+                @click="printBudget">
+            <v-icon>mdi-printer</v-icon>
+        </v-btn>
     </v-container>
 </template>
 
@@ -159,7 +170,7 @@
 
         headerColumns.stack.push(subheaderColumns);
 
-        let autoQueries = budget.queries.filter((query) => { return query.type === 'Transport'});
+        let autoQueries = budget.queries.filter((query) => { return query.type.includes('Transport')});
 
         if (autoQueries.length) {
             let autoSubheader = {
@@ -177,7 +188,7 @@
             headerColumns.stack.push(generateSubTotal(autoQueries));
         }
 
-        let supportQueries = budget.queries.filter((query) => { return query.type !== 'Transport'});
+        let supportQueries = budget.queries.filter((query) => { return !query.type.includes('Transport')});
 
         if (supportQueries.length) {
             let supportSubheader = {
@@ -229,7 +240,7 @@
 
         let dateCreated = moment();
         dateCreated.week(week - 1);
-        dateCreated.isoWeekday(5);
+        dateCreated.isoWeekday(4);
 
         let total = 0;
 

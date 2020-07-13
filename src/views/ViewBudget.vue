@@ -49,6 +49,52 @@
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+    function getCompaniesFromActivities(query, pdf = false) {
+        let companies = '';
+
+        query.activities.forEach((activity, index, activities) => {
+            if(!companies.includes(activity.company)) {
+                if (pdf) {
+                    companies += truncateCompanyName(activity.company);
+                }
+                else {
+                    companies += activity.company;
+                }
+
+                if(index !== (activities.length -1)) {
+                    companies += ', ';
+                }
+            }
+        });
+
+        return companies;
+    }
+
+    function truncateCompanyName(name) {
+        let result = '';
+
+        switch (name) {
+            case 'ВАН Холдинг': {
+                result = 'ВАН';
+                break;
+            }
+            case 'Европа-ВН': {
+                result = 'Е ВН';
+                break;
+            }
+            case 'Винтерко-БГ': {
+                result = 'Вин';
+                break;
+            }
+            case 'ЕвроХарт': {
+                result = 'Е Х';
+                break;
+            }
+        }
+
+        return result;
+    }
+
     function generateQueryRows(queries) {
         let segment = {
             table: {
@@ -62,7 +108,7 @@
             row.push({ text: query.title, style: 'row' });
             row.push({ text: query.reason, style: 'row' });
             row.push({ text: query.places ? query.places.toString() : 'ФФ', style: 'row' });
-            row.push({ text: getCompaniesFromActivities(query), style: 'row' });
+            row.push({ text: getCompaniesFromActivities(query, true), style: 'row' });
             row.push({ text: query.contractor, style: 'row' });
             let payDate = moment(query.payDate);
             row.push({ text: query.totalSum, style: 'sumCell' });
@@ -262,22 +308,6 @@
         definition.content[0].columns.push(signatureColumns);
 
         return definition;
-    }
-
-    function getCompaniesFromActivities(query) {
-        let companies = '';
-
-        query.activities.forEach((activity, index, activities) => {
-            if(!companies.includes(activity.company)) {
-                companies += activity.company;
-
-                if(index !== (activities.length -1)) {
-                    companies += ', ';
-                }
-            }
-        });
-
-        return companies;
     }
 
     export default {

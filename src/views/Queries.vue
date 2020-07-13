@@ -78,6 +78,9 @@
 <script>
     import * as pdfMake from 'pdfmake/build/pdfmake.js';
     import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+    import { create, all } from 'mathjs';
+
+    const math = create(all);
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -196,7 +199,7 @@
         let activitiesSummary = {
             columns: [
                 { text: 'Всичко без ДДС: ', style: 'rightAlign', width: '77%' },
-                { text: totalSumWithoutVAT + ' лв.',  style: 'mainTextBold', width: '*' }
+                { text: math.round(totalSumWithoutVAT, 2) + ' лв.',  style: 'mainTextBold', width: '*' }
             ],
             columnGap: 7,
             margin: [ 15, 10, 15, 0 ]
@@ -265,6 +268,11 @@
         paymentInfo.columns[1].stack.push({ text: payDate.toLocaleDateString('bg-BG'), margin: [ 0, 0, 0, 10 ]});
         paymentInfo.columns[0].stack.push({ text: 'Начин на плащане: ' });
         paymentInfo.columns[1].stack.push({ text: translatePayment(query.paymentMethod)});
+
+        if (query.notes.length) {
+            paymentInfo.columns[0].stack.push({ text: 'Забележки: ', margin: [ 0, 0, 0, 10 ] });
+            paymentInfo.columns[1].stack.push({ text: query.notes});
+        }
 
         definition.content.push(paymentInfo);
 

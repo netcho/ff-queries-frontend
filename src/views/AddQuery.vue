@@ -144,7 +144,7 @@
             return {
                 valid: true,
                 activities: [],
-                companies: ['ВАН Холдинг ЕООД', 'Винтерко-БГ ЕООД', 'Европа-ВН ЕООД', 'ЕвроХарт ЕООД'],
+                companies: ['ВАН Холдинг', 'Винтерко-БГ', 'Европа-ВН', 'ЕвроХарт'],
                 categories: [],
                 type: [],
                 chosenCategories: null,
@@ -286,6 +286,7 @@
                 let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes,'approved');
                 query.payDate = this.payDate;
                 query.dateCreated = new Date().toISOString().substr(0, 10);
+                query.createdBy = this.$store.state.user._id;
                 this.axios.post('/query', query).
                 then(() => {
                     this.$router.push({name: 'Queries'});
@@ -300,6 +301,7 @@
                         payDate.week(payDate.week() + 1);
                         query.payDate = payDate.format('YYYY-MM-DD');
                         query.dateCreated = response.data.dateCreated;
+                        query.createdBy = this.$store.state.user._id;
                         this.$http.put('/query/' + this.$route.params.templateQueryId, query).
                         then(() => this.$router.push({ name: 'Queries' }));
                     }
@@ -324,10 +326,7 @@
             if(this.$route.params.templateQueryId) {
                 this.$http.get('/query/' + this.$route.params.templateQueryId).
                 then((response) => {
-                    this.isSupport = response.data.type.findIndex((type) => type === 'Support') !== -1;
-                    this.isRepair = response.data.type.findIndex((type) => type === 'Repair') !== -1;
-                    this.isInvest = response.data.type.findIndex((type) => type === 'Invest') !== -1;
-                    this.isTransport = response.data.type.findIndex((type) => type === 'Transport') !== -1;
+                    this.type = response.data.type;
                     this.chosenCategories = response.data.category;
                     this.title = response.data.title;
                     this.contragent = response.data.contractor;

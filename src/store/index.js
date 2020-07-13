@@ -22,7 +22,7 @@ export default new Vuex.Store({
       state.token = token;
       state.user = user;
 
-      if (user.role === 'admin') {
+      if (user.role === 'admin' || user.role === 'user') {
         state.rules = [
           { action: 'read', subject: 'Query' },
           { action: 'create', subject: 'Query' },

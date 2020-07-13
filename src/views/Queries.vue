@@ -18,6 +18,7 @@
                 :items-per-page="20"
                 :loading="loading"
                 :search="search"
+                item-key="_id"
                 calculate-widths
                 class="elevation-1 mx-auto"
                 @click:row="viewQuery">

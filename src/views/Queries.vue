@@ -25,6 +25,9 @@
             <template v-slot:item.type="{ item }">
                 {{ translateType(item) }}
             </template>
+            <template v-slot:item.companies="{ item }">
+                {{ getCompanies(item) }}
+            </template>
             <template v-slot:item.status="{ item }">
                 <v-chip :color="getColor(item)">{{ $t(item.status) }}</v-chip>
             </template>
@@ -94,6 +97,27 @@
         }
     }
 
+    function getCompaniesFromActivities(query, pdf = false) {
+        let companies = '';
+
+        query.activities.forEach((activity, index, activities) => {
+            if(!companies.includes(activity.company)) {
+                if (pdf) {
+                    companies += activity.company + ' ЕООД';
+                }
+                else {
+                    companies += activity.company;
+                }
+
+                if(index !== (activities.length -1)) {
+                    companies += ', ';
+                }
+            }
+        });
+
+        return companies;
+    }
+
     function generateDefinition(query, user) {
         let definition = {
             content: [],
@@ -161,7 +185,7 @@
 
         definition.content.push({ text: 'За нуждите на ЕП', style: 'subHeading', margin: [0, 0, 0, 10]});
         definition.content.push({ text: 'З А Я В К А', style: 'title'});
-        definition.content.push({ text: query.companies, style: 'companies', margin: [25, 0, 25, 20]});
+        definition.content.push({ text: getCompaniesFromActivities(query, true), style: 'companies', margin: [25, 0, 25, 20]});
 
         let main1 = {
             columns: [
@@ -401,6 +425,9 @@
                 });
 
                 return type;
+            },
+            getCompanies: function (query) {
+                return getCompaniesFromActivities(query);
             }
         }
     }

@@ -187,22 +187,21 @@
         definition.content.push(main1);
 
         let activities = {
-            columns: [{
-                stack: [],
-                width: '78%',
-                style: 'mainText'
-            }, {
-                stack: [],
-                width: '12%',
-                style: 'mainTextBold'
-            }, {
-                stack: [],
-                width: '*',
-                style: 'mainText'
-            }],
-            columnGap: 3,
+            layout: 'noBorders',
+            table: {
+                widths: [400, 60, 40],
+                body: []
+            },
             margin: [ 15, 0, 15, 0 ]
         }
+
+        query.activities.forEach((activity, index) => {
+            let row = [];
+            row.push({ text: (index + 1) + '. ' + activity.company + ' - ' + activity.name + (activity.places ? ' : ' + activity.places : ''), style: 'mainText' });
+            row.push({ text: activity.price + ' лв', style: 'rightAlignBold' });
+            row.push({ text: 'без ДДС', style: 'mainText' });
+            activities.table.body.push(row);
+        });
 
         let totalSumWithoutVAT = 0;
 
@@ -210,27 +209,15 @@
             totalSumWithoutVAT += Number(activity.price);
         });
 
-        let activitiesSummary = {
-            columns: [
-                { text: 'Всичко без ДДС: ', style: 'rightAlign', width: '77%' },
-                { text: math.round(totalSumWithoutVAT, 2) + ' лв.',  style: 'mainTextBold', width: '*' }
-            ],
-            columnGap: 7,
-            margin: [ 15, 10, 15, 0 ]
-        }
+        let activitiesSummary = [
+            { text: 'Всичко без ДДС: ', style: 'rightAlignBold' },
+            { text: math.round(totalSumWithoutVAT, 2) + ' лв.', style: 'rightAlignBold' },
+            { text: '' }
+        ];
 
-        query.activities.forEach((activity, index) => {
-            let name = (index + 1) + '. ' +activity.company + ' - ' + activity.name;
-            if (activity.places && activity.places.length) {
-                name += ' ' + activity.places;
-            }
-            activities.columns[0].stack.push(name);
-            activities.columns[1].stack.push(activity.price + ' лв.');
-            activities.columns[2].stack.push('без ДДС');
-        });
+        activities.table.body.push(activitiesSummary);
 
         definition.content.push(activities);
-        definition.content.push(activitiesSummary);
 
         let contragent = {
             columns: [{

@@ -15,7 +15,7 @@
             <v-data-table
                 :headers="headers"
                 :items="queries"
-                :items-per-page="20"
+                :items-per-page="10"
                 :loading="loading"
                 :search="search"
                 item-key="_id"

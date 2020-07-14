@@ -52,20 +52,21 @@
     function getCompaniesFromActivities(query, pdf = false) {
         let companies = '';
 
-        query.activities.forEach((activity, index, activities) => {
-            if(!companies.includes(activity.company)) {
-                if (pdf) {
-                    companies += truncateCompanyName(activity.company);
-                }
-                else {
-                    companies += activity.company;
-                }
+        if (query.activities.length > 1) {
+            query.activities.forEach((activity, index, activities) => {
+                let companyName = pdf ? truncateCompanyName(activity.company) : activity.company;
+                if(!companies.includes(companyName)) {
+                    companies += companyName;
 
-                if(index !== (activities.length -1)) {
-                    companies += ', ';
+                    if(index !== (activities.length -1)) {
+                        companies += ', ';
+                    }
                 }
-            }
-        });
+            });
+        }
+        else {
+            companies = query.activities[0].company;
+        }
 
         return companies;
     }
@@ -107,7 +108,15 @@
             let row = [];
             row.push({ text: query.title, style: 'row' });
             row.push({ text: query.reason, style: 'row' });
-            row.push({ text: query.places ? query.places.toString() : 'ФФ', style: 'row' });
+            let places = 'ФФ';
+            if (query.places) {
+                let result = query.places.toString();
+
+                if (result.length < 20)
+                    places = result
+            }
+
+            row.push({ text: places, style: 'row' });
             row.push({ text: getCompaniesFromActivities(query, true), style: 'row' });
             row.push({ text: query.contractor, style: 'row' });
             let payDate = moment(query.payDate);

@@ -45,21 +45,10 @@
                     <v-icon @click.stop="createFrom(item)" v-if="$can('create', 'Query')">
                         mdi-content-copy
                     </v-icon>
-                    <v-icon class="ml-3" @click.stop="showDeleteDialog = !showDeleteDialog" v-if="$can('delete', 'Query')">
+                    <v-icon class="ml-3" @click.stop="deleteQuery(item)" v-if="$can('delete', 'Query')">
                         mdi-trash-can-outline
                     </v-icon>
                 </v-row>
-                <v-dialog v-model="showDeleteDialog" persistent max-width="290">
-                    <v-card>
-                        <v-card-title class="headline">{{$t('DeleteQueryTitle')}}</v-card-title>
-                        <v-card-text>{{$t('DeleteConfirm')}}</v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn text @click="showDeleteDialog = !showDeleteDialog">{{$t('Cancel')}}</v-btn>
-                            <v-btn text @click="deleteQuery(item)">{{$t('Delete')}}</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
             </template>
             </v-data-table>
         </v-card>
@@ -389,13 +378,16 @@
                 this.$router.push({name: 'ViewQuery', params: {id: query._id}});
             },
             deleteQuery: function (query) {
-                this.$http.delete('/query/' + query._id).then(() => {
+                this.$dialog.confirm({ text: this.$t('DeleteConfirm'), title: this.$t('DeleteQueryTitle')}).
+                then(() => {
+                    return this.$http.delete('/query/' + query._id);
+                }).
+                then(() => {
                     let queryIndex = this.queries.findIndex((elem) => {
                         return elem._id === query._id;
                     });
                     this.queries.splice(queryIndex, 1);
-                    this.showDeleteDialog = false;
-                })
+                });
             },
             createFrom: function (query) {
                 this.$router.push({name: 'AddQuery', params: {templateQueryId: query._id}});

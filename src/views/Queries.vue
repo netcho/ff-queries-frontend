@@ -71,9 +71,9 @@
 <script>
     import * as pdfMake from 'pdfmake/build/pdfmake.js';
     import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-    import { create, all } from 'mathjs';
+    //import { create, all } from 'mathjs';
 
-    const math = create(all);
+    //const math = create(all);
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -198,7 +198,7 @@
         query.activities.forEach((activity, index) => {
             let row = [];
             row.push({ text: (index + 1) + '. ' + activity.company + ' - ' + activity.name + (activity.places ? ' : ' + activity.places : ''), style: 'mainText' });
-            row.push({ text: activity.price + ' лв', style: 'rightAlignBold' });
+            row.push({ text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(activity.price), style: 'rightAlignBold' });
             row.push({ text: 'без ДДС', style: 'mainText' });
             activities.table.body.push(row);
         });
@@ -211,7 +211,7 @@
 
         let activitiesSummary = [
             { text: 'Всичко без ДДС: ', style: 'rightAlignBold' },
-            { text: math.round(totalSumWithoutVAT, 2) + ' лв.', style: 'rightAlignBold' },
+            { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(totalSumWithoutVAT), style: 'rightAlignBold' },
             { text: '' }
         ];
 

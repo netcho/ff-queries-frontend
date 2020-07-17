@@ -59,6 +59,7 @@
   "Username": "Username",
   "VATIncluded": "VAT Included",
   "Week": "Week",
+  "WrongPassword": "The pasword you have specified is incorrect",
   "approved": "approved",
   "pending": "pending",
   "rejected": "rejected"

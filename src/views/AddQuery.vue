@@ -59,7 +59,7 @@
                         </v-row>
                         <v-textarea v-model="notes" height="100" :placeholder="$t('Notes')"></v-textarea>
                     </v-col>
-                    <v-col>
+                    <v-col :cols="6">
                         <v-list>
                             <v-list-item two-line v-for="(activity, index) in activities" :key="index">
                                 <v-list-item-content>
@@ -82,7 +82,6 @@
                                 {{$t('Total')}}: {{totalPrice}} лв. с ДДС
                             </v-list-item>
                         </v-list>
-
                         <v-dialog v-model="showActivityDialog" width="500">
                             <template v-slot:activator="{ on }">
                                 <v-btn v-on="on" @click="showAddActivityDialog">{{$t('AddActivity')}}</v-btn>
@@ -111,8 +110,20 @@
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="ma-2" tile large color="indigo" dark v-if="showCreateButton" :disabled="!valid || activities.length === 0" @click="saveQuery">{{$t('Create')}}</v-btn>
-                <v-btn class="ma-2" tile large color="indigo" dark v-else :disabled="!valid || activities.length === 0" @click="redactQuery">{{$t('Save')}}</v-btn>
+                <v-btn large
+                       color="primary"
+                       v-if="showCreateButton"
+                       :disabled="!valid || activities.length === 0 || type.length === 0"
+                       @click="saveQuery">
+                    {{$t('Create')}}
+                </v-btn>
+                <v-btn large
+                       color="primary"
+                       v-else
+                       :disabled="!valid || activities.length === 0  || type.length === 0"
+                       @click="redactQuery">
+                    {{$t('Save')}}
+                </v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
@@ -165,9 +176,6 @@
                 newActivity: {},
                 newActivityFormValid: false,
                 updateActivityIndex: null,
-                itemNameRules: [
-                    v => !!v || 'Name is required'
-                ],
                 showActivityDialog: false,
                 showAddButton: false,
                 showUpdateButton: false,
@@ -278,7 +286,7 @@
             },
             calculateNextPayDate: function() {
                 let payDateValue = this.$moment();
-                payDateValue.week(payDateValue.week()+1);
+                payDateValue.week(payDateValue.week() + (payDateValue.isoWeekday() < 4 ? 1 : 2));
                 payDateValue.isoWeekday(4);
                 this.payDate = payDateValue.format('YYYY-MM-DD');
             },

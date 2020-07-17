@@ -91,15 +91,15 @@
 
         query.activities.forEach((activity, index, activities) => {
             if(!companies.includes(activity.company)) {
+                if(index < activities.length && index > 0) {
+                    companies += ', ';
+                }
+
                 if (pdf) {
                     companies += activity.company + ' ЕООД';
                 }
                 else {
                     companies += activity.company;
-                }
-
-                if(index !== (activities.length -1)) {
-                    companies += ', ';
                 }
             }
         });

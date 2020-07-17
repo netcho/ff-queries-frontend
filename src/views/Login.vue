@@ -39,7 +39,9 @@
                     this.$router.push({name: 'Queries'})
                 }, (err) => {
                     if (err.status === 401) {
-                        console.log('error authenticated');
+                        this.$dialog.message.error(this.$t('WrongPassword'), {
+                            position: 'top-right'
+                        });
                     }
                 });
             }

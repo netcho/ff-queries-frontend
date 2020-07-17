@@ -8,7 +8,7 @@
             <v-data-table
                     :headers="headers"
                     :items="budget.queries"
-                    :items-per-page="20"
+                    :items-per-page="10"
                     :loading="showProgressBar"
                     class="elevation-1 mx-auto"
                     @click:row="viewQuery">

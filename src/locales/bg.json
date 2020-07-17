@@ -60,6 +60,7 @@
   "Username": "Потребителско име",
   "VATIncluded": "С включено ДДС",
   "Week": "Седмица",
+  "WrongPassword": "Въвели сте грешна парола",
   "approved": "одобрена",
   "pending": "чакаща",
   "rejected": "отхвърлена"

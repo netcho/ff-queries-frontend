@@ -8,56 +8,56 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/:lang',
-    component: {
-      template: '<router-view></router-view>'
-    },
-    children: [{
+    component: { template: '<router-view></router-view>' },
+    children: [
+    {
       path: 'login',
       name: 'Login',
-      component: () => import(/* webpackChunkName: "Login" */'@/views/Login.vue')
-    },{
+      component: () => import(/* webpackChunkName: "Login" */'@/views/Login.vue')},
+    {
       path: '',
       name: 'Home',
       meta: {
         requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Home" */ '@/views/Home.vue')
-    },{
+      component: () => import(/* webpackChunkName: "Home" */ '@/views/Home.vue')},
+    {
       path: 'queries',
       name: 'Queries',
       meta: {
         requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Queries" */ '@/views/Queries.vue')
-    },{
+      component: () => import(/* webpackChunkName: "Queries" */ '@/views/Queries.vue')},
+    {
       path: 'queries/add/:templateQueryId?/:wasRejected?',
       name: 'AddQuery',
       meta: {
         requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Queries" */ '@/views/AddQuery.vue')
-    },{
+      component: () => import(/* webpackChunkName: "Queries" */ '@/views/AddQuery.vue')},
+    {
       path: 'query/:id',
       name: 'ViewQuery',
       meta: {
         requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Queries" */ '@/views/ViewQuery.vue')
-    },{
+      component: () => import(/* webpackChunkName: "Queries" */ '@/views/ViewQuery.vue')},
+    {
       path: 'budgets',
       name: 'Budgets',
       meta: {
         requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Budgets" */ '@/views/Budgets.vue')
-    },{
+      component: () => import(/* webpackChunkName: "Budgets" */ '@/views/Budgets.vue')},
+    {
       path: 'budget/:week',
       name: 'ViewBudget',
       meta: {
         requiresAuth: true
       },
       component: () => import(/* webpackChunkName: "Budgets" */ '@/views/ViewBudget.vue')
-    }]
+    }
+    ]
   }
 ];
 

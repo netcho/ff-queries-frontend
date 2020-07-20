@@ -11,9 +11,12 @@
                             <v-chip :value="'Investment'">{{$t('Investment')}}</v-chip>
                             <v-chip :value="'Transport'">{{$t('Transport')}}</v-chip>
                         </v-chip-group>
-                        <v-combobox v-model="chosenCategories"
+                        <v-combobox v-model="category"
                                     :items="categories"
-                                    :label="$t('Category')">
+                                    :label="$t('Category')"
+                                    :error-messages="categoryErrors"
+                                    @input="$v.category.$touch()"
+                                    @blur="$v.category.$touch()">
                         </v-combobox>
                         <v-text-field v-model="title"
                                       :label="$t('Title')"
@@ -131,7 +134,7 @@
 
 <script>
     import { all, create } from 'mathjs'
-    import { required, minLength } from 'vuelidate/lib/validators'
+    import { required, minLength, maxLength } from 'vuelidate/lib/validators'
 
     const math = create(all);
 
@@ -158,7 +161,7 @@
                 companies: ['ВАН Холдинг', 'Винтерко-БГ', 'Европа-ВН', 'ЕвроХарт'],
                 categories: [],
                 type: [],
-                chosenCategories: null,
+                category: '',
                 title: '',
                 contragent: '',
                 reason: '',
@@ -183,9 +186,14 @@
             }
         },
         validations: {
+            category: {
+                required,
+                minLength: minLength(3)
+            },
             title: {
                 required,
-                minLength: minLength(4)
+                minLength: minLength(4),
+                maxLength: maxLength(40)
             },
             contragent: {
                 required,
@@ -193,7 +201,8 @@
             },
             reason: {
                 required,
-                minLength: minLength(10)
+                minLength: minLength(10),
+                maxLength: maxLength(40)
             }
         },
         computed: {
@@ -211,6 +220,13 @@
                 if (!this.$v.title.$dirty)
                     return errors;
                 !this.$v.title.required && errors.push(this.$t('TitleRequired'));
+                return errors;
+            },
+            categoryErrors: function () {
+                const errors = [];
+                if (!this.$v.category.$dirty)
+                    return errors;
+                !this.$v.category.required && errors.push(this.$t('CategoryRequired'));
                 return errors;
             },
             contragentErrors: function () {
@@ -291,7 +307,7 @@
                 this.payDate = payDateValue.format('YYYY-MM-DD');
             },
             saveQuery: function () {
-                let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes,'approved');
+                let query = constructQueryObject(this.type, this.category, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes,'approved');
                 query.payDate = this.payDate;
                 query.dateCreated = new Date().toISOString().substr(0, 10);
                 query.createdBy = this.$store.state.user._id;

@@ -92,18 +92,18 @@
                             <v-card>
                                 <v-card-title>{{$t('AddActivityTitle')}}</v-card-title>
                                 <v-card-text>
-                                    <v-form v-model="newActivityFormValid">
-                                        <v-select required :items="companies" :label="$t('Company')" v-model="newActivity.company"></v-select>
-                                        <v-text-field required :label="$t('Title')" v-model="newActivity.name" :rules="itemNameRules"></v-text-field>
-                                        <v-text-field required :label="$t('Price')" type="number" v-model="newActivity.price"></v-text-field>
-                                        <v-checkbox required :label="$t('VATIncluded')" v-model="newActivity.priceVAT"></v-checkbox>
-                                        <v-text-field required :label="$t('Places')" v-model="newActivity.places"></v-text-field>
+                                    <v-form v-model="newActivityFormValid" ref="activityForm">
+                                        <v-select :items="companies" :label="$t('Company')" v-model="newActivity.company"></v-select>
+                                        <v-text-field :label="$t('Title')" v-model="newActivity.name"></v-text-field>
+                                        <v-text-field :label="$t('Price')" type="number" v-model="newActivity.price"></v-text-field>
+                                        <v-checkbox :label="$t('VATIncluded')" v-model="newActivity.priceVAT"></v-checkbox>
+                                        <v-text-field :label="$t('Places')" v-model="newActivity.places"></v-text-field>
                                     </v-form>
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
                                     <v-btn text color="primary" v-if="showAddButton" @click="addActivity" :disabled="!newActivityFormValid">{{$t('Add')}}</v-btn>
-                                    <v-btn text color="primary" v-else-if="showUpdateButton" @click="updateActivity" :disabled="!newActivityFormValid">{{$t('Save')}}</v-btn>
+                                    <v-btn text color="primary" v-else @click="updateActivity" :disabled="!newActivityFormValid">{{$t('Save')}}</v-btn>
                                     <v-btn text color="primary" @click="closeActivityDialog">{{$t('Cancel')}}</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -115,7 +115,7 @@
                 <v-spacer></v-spacer>
                 <v-btn large
                        color="primary"
-                       v-if="showCreateButton"
+                       v-if="!$route.params.edit"
                        :disabled="!valid || activities.length === 0 || type.length === 0"
                        @click="saveQuery">
                     {{$t('Create')}}
@@ -165,6 +165,7 @@
                 title: '',
                 contragent: '',
                 reason: '',
+                status: '',
                 paymentMethod: 'bank',
                 isRepair: false,
                 isSupport: false,
@@ -172,17 +173,15 @@
                 isTransport: false,
                 isUrgent: false,
                 payDate: null,
+                dateCreated: null,
                 menu2: false,
                 contragents: [],
                 notes: '',
-                templateQuery: {},
                 newActivity: {},
                 newActivityFormValid: false,
                 updateActivityIndex: null,
                 showActivityDialog: false,
-                showAddButton: false,
-                showUpdateButton: false,
-                showCreateButton: true,
+                showAddButton: false
             }
         },
         validations: {
@@ -193,7 +192,7 @@
             title: {
                 required,
                 minLength: minLength(4),
-                maxLength: maxLength(40)
+                maxLength: maxLength(56)
             },
             contragent: {
                 required,
@@ -202,7 +201,20 @@
             reason: {
                 required,
                 minLength: minLength(10),
-                maxLength: maxLength(40)
+                maxLength: maxLength(30)
+            },
+            newActivity: {
+                name: {
+                    required,
+                    minLength: minLength(3),
+                    maxLength: maxLength(50)
+                },
+                price: {
+                    required
+                },
+                company: {
+                    required
+                }
             }
         },
         computed: {
@@ -220,6 +232,7 @@
                 if (!this.$v.title.$dirty)
                     return errors;
                 !this.$v.title.required && errors.push(this.$t('TitleRequired'));
+                !this.$v.title.maxLength && errors.push(this.$t('TitleTooLong'));
                 return errors;
             },
             categoryErrors: function () {
@@ -241,6 +254,7 @@
                 if (!this.$v.reason.$dirty)
                     return errors;
                 !this.$v.reason.required && errors.push(this.$t('ReasonRequired'));
+                !this.$v.reason.maxLength && errors.push(this.$t('ReasonTooLong'));
                 return errors;
             }
         },
@@ -311,29 +325,20 @@
                 query.payDate = this.payDate;
                 query.dateCreated = new Date().toISOString().substr(0, 10);
                 query.createdBy = this.$store.state.user._id;
-                this.axios.post('/query', query).
+                this.$http.post('/query', query).
                 then(() => {
                     this.$router.push({name: 'Queries'});
                 });
             },
             redactQuery: function () {
-                this.$http.get('/query/' + this.$route.params.templateQueryId).
-                then((response) => {
-                    if(response.data.totalSum <= this.totalPrice) {
-                        let query = constructQueryObject(this.type, this.chosenCategories, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes, 'approved');
-                        let payDate = this.$moment(response.data.payDate);
-                        payDate.week(payDate.week() + 1);
-                        query.payDate = payDate.format('YYYY-MM-DD');
-                        query.dateCreated = response.data.dateCreated;
-                        query.createdBy = this.$store.state.user._id;
-                        this.$http.put('/query/' + this.$route.params.templateQueryId, query).
-                        then(() => this.$router.push({ name: 'Queries' }));
-                    }
-                    else {
-                        this.calculateNextPayDate();
-                        this.saveQuery();
-                    }
-                });
+                let query = constructQueryObject(this.type, this.category, this.title, this.activities, this.contragent, this.reason, this.paymentMethod, this.isUrgent, this.notes, 'approved');
+                query.dateCreated = this.dateCreated;
+                query.createdBy = this.$store.state.user._id;
+                let payDate = this.$moment(this.payDate);
+                payDate.week(payDate.week() + (this.status === 'rejected' ? 1 : 0));
+                query.payDate = payDate.format('YYYY-MM-DD');
+                this.$http.put('/query/' + this.$route.params.templateQueryId, query).
+                then(() => this.$router.push({ name: 'Queries' }));
             }
         },
         created: function () {
@@ -351,7 +356,7 @@
                 this.$http.get('/query/' + this.$route.params.templateQueryId).
                 then((response) => {
                     this.type = response.data.type;
-                    this.chosenCategories = response.data.category;
+                    this.category = response.data.category;
                     this.title = response.data.title;
                     this.contragent = response.data.contractor;
                     this.reason = response.data.reason;
@@ -359,11 +364,10 @@
                     this.isUrgent = response.data.isUrgent;
                     this.notes = response.data.notes;
 
-                    this.templateQuery = response.data;
-
-                    if(this.$route.params.wasRejected) {
-                        this.showCreateButton = false;
+                    if(this.$route.params.edit) {
                         this.payDate = response.data.payDate;
+                        this.dateCreated = response.data.dateCreated;
+                        this.status = response.data.status;
                     }
                 }).
                 catch(() => {

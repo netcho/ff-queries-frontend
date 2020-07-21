@@ -99,7 +99,7 @@
     function generateQueryRows(queries) {
         let segment = {
             table: {
-                widths: [ 200, 100, 60, 70, 105, 34, 30, 35],
+                widths: [ 240, 100, 60, 70, 105, 34, 30],
                 body: []
             }
         }
@@ -121,8 +121,7 @@
             row.push({ text: query.contractor, style: 'row' });
             let payDate = moment(query.payDate);
             row.push({ text: query.totalSum, style: 'sumCell' });
-            row.push({ text: payDate.format('D MMM'), style: 'row' });
-            row.push({ text: 'фактури', style: 'row' });
+            row.push({ text: payDate.format('D.M'), style: 'row' });
             segment.table.body.push(row);
         });
 
@@ -138,11 +137,11 @@
 
         return {
             table: {
-                widths: [570, 118],
+                widths: [611, 73],
                 body: [
                     [
                         { text: 'Общо', style: 'rowRightBold' },
-                        { text: price + ' лв.', style: 'rowRightBold', margin: [ 0, 0, 70, 0] }
+                        { text: price + ' лв.', style: 'rowRightBold', margin: [ 0, 0, 26, 0] }
                     ]
                 ]
             }
@@ -156,33 +155,33 @@
             }],
             styles: {
                 title: {
-                    fontSize: 7,
+                    fontSize: 8,
                     bold: true,
                     alignment: 'center'
                 },
                 titleLeft: {
-                    fontSize: 7,
+                    fontSize: 8,
                     bold: true,
                     alignment: 'left'
                 },
                 row: {
-                    fontSize: 7
+                    fontSize: 8
                 },
                 rowRightBold: {
-                    fontSize: 7,
+                    fontSize: 8,
                     alignment: 'right',
                     bold: true
                 },
                 rowBold: {
-                    fontSize: 7,
+                    fontSize: 8,
                     bold: true
                 },
                 name: {
-                    fontSize: 7,
+                    fontSize: 8,
                     italics: true
                 },
                 sumCell: {
-                    fontSize: 7,
+                    fontSize: 8,
                     alignment: 'right'
                 }
             },
@@ -194,12 +193,11 @@
         let headerColumns = {
             stack: [{
                 table: {
-                    widths: [570, 35, 30, 35],
+                    widths: [611, 29, 35],
                     body: [
                         [ { text: 'Договорни, фактурирани и очаквани плащания от дирекция "ЕП"', style: 'title' },
                           { text: new Date().getFullYear(), style: 'title' },
-                          { text: 'плащане', style: 'title' },
-                          { text: 'документ', style: 'title' },
+                          { text: 'плащане', style: 'title' }
                         ]
                     ]
                 }
@@ -208,7 +206,7 @@
 
         let subheaderColumns = {
             table: {
-                widths: [ 200, 100, 60, 70, 105, 34, 30, 35],
+                widths: [ 240, 100, 60, 70, 105, 34, 30],
                 body: [
                     [ { text: 'Основание', style: 'title' },
                       { text: '№ по ред плащане - чл., ал. от договора', style: 'title' },
@@ -216,8 +214,7 @@
                       { text: 'фирма ФФ', style: 'title' },
                       { text: 'контрагент', style: 'title' },
                       { text: 'сума', style: 'title' },
-                      { text: 'дата', style: 'title' },
-                      { text: '' }
+                      { text: 'дата', style: 'title' }
                     ]
                 ]
             }
@@ -230,7 +227,7 @@
         if (autoQueries.length) {
             let autoSubheader = {
                 table: {
-                    widths: [697],
+                    widths: [690],
                     body: [
                         [
                             { text: 'АВТОПАРК', style: 'titleLeft'}
@@ -248,7 +245,7 @@
         if (supportQueries.length) {
             let supportSubheader = {
                 table: {
-                    widths: [697],
+                    widths: [693],
                     body: [
                         [
                             { text: 'ПОДДРЪЖКА', style: 'titleLeft'}
@@ -307,7 +304,7 @@
             columns: [
                 { text: dateCreated.format('D.MM.YYYY'), style: 'row', margin: [10, 10, 0, 0] },
                 { text: 'Седмичен бюджет №' + week, style: 'rowBold', margin: [10, 10, 10, 0] },
-                { text: 'Всико с ДДС:' + total + ' лв.', style: 'rowBold', margin: [ 90, 3, 10, 0] }
+                { text: 'Всичко с ДДС: ' + total + ' лв.', style: 'rowBold', margin: [ 112, 3, 10, 0] }
             ]
         }
 

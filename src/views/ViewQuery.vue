@@ -18,11 +18,14 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item @click="rejectQuery" v-if="query.status !== 'rejected'">
+                            <v-list-item @click="rejectQuery" v-if="$can('update', 'Query')">
                                 <v-list-item-title><v-icon>mdi-file-excel</v-icon>{{$t('Reject')}}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="redactQuery" v-if="query.status === 'rejected'">
+                            <v-list-item @click="redactQuery" v-if="$can('update', 'Query')">
                                 <v-list-item-title><v-icon>mdi-file-document-edit</v-icon>{{$t('Edit')}}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="deleteQuery">
+                                <v-list-item-title><v-icon>mdi-trash-can</v-icon>{{$t('Delete')}}</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -179,12 +182,6 @@
             },
             rejectQuery: function () {
                 this.query.status = 'rejected';
-                this.updateQuery();
-            },
-            redactQuery: function () {
-                this.$router.push({ name: 'AddQuery', params: { templateQueryId: this.$route.params.id, wasRejected: true} });
-            },
-            updateQuery: function () {
                 delete this.query._id;
                 this.$http.put('/query/' + this.$route.params.id, this.query).
                 then((response) => {
@@ -192,6 +189,9 @@
                         this.fetchQuery();
                     }
                 })
+            },
+            redactQuery: function () {
+                this.$router.push({ name: 'AddQuery', params: { templateQueryId: this.$route.params.id, edit: true} });
             },
             fetchQuery: function () {
                 this.$http.get('/query/' + this.$route.params.id).
@@ -203,6 +203,15 @@
                 }).
                 finally(() => {
                     this.showProgressBar = false;
+                });
+            },
+            deleteQuery: function () {
+                this.$dialog.confirm({ text: this.$t('DeleteConfirm'), title: this.$t('DeleteQueryTitle')}).
+                then(() => {
+                    return this.$http.delete('/query/' + this.query._id);
+                }).
+                then(() => {
+                    return this.$router.push({ name: 'Queries' });
                 });
             }
         },

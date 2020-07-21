@@ -32,10 +32,13 @@
                 <v-chip :color="getColor(item)">{{ $t(item.status) }}</v-chip>
             </template>
             <template v-slot:item.dateCreated="{ item }">
-                {{ item.dateCreated | moment('ll') }}
+                {{ item.dateCreated | moment('D.M.YYYY') }}
             </template>
             <template v-slot:item.payDate="{ item }">
-                {{ item.payDate | moment('ll') }}
+                {{ item.payDate | moment('D.M.YYYY') }}
+            </template>
+            <template v-slot:item.totalSum="{ item }">
+                {{ new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(item.totalSum)}}
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-row justify="space-around" class="flex-nowrap">
@@ -45,8 +48,8 @@
                     <v-icon @click.stop="createFrom(item)" v-if="$can('create', 'Query')">
                         mdi-content-copy
                     </v-icon>
-                    <v-icon class="ml-3" @click.stop="deleteQuery(item)" v-if="$can('delete', 'Query')">
-                        mdi-trash-can-outline
+                    <v-icon class="ml-3" @click.stop="editQuery(item)" v-if="$can('update', 'Query') && isQueryFromCurrentBudget(item)">
+                        mdi-pencil
                     </v-icon>
                 </v-row>
             </template>
@@ -364,20 +367,15 @@
             viewQuery: function (query) {
                 this.$router.push({name: 'ViewQuery', params: {id: query._id}});
             },
-            deleteQuery: function (query) {
-                this.$dialog.confirm({ text: this.$t('DeleteConfirm'), title: this.$t('DeleteQueryTitle')}).
-                then(() => {
-                    return this.$http.delete('/query/' + query._id);
-                }).
-                then(() => {
-                    let queryIndex = this.queries.findIndex((elem) => {
-                        return elem._id === query._id;
-                    });
-                    this.queries.splice(queryIndex, 1);
-                });
+            editQuery: function(query) {
+                this.$router.push({ name: 'AddQuery', params: { templateQueryId: query._id, edit: true }});
             },
             createFrom: function (query) {
-                this.$router.push({name: 'AddQuery', params: {templateQueryId: query._id}});
+                this.$router.push({name: 'AddQuery', params: { templateQueryId: query._id }});
+            },
+            isQueryFromCurrentBudget: function (query) {
+                let lastThursday = this.$moment().isoWeekday(4).isoWeek(this.$moment().isoWeek() - 1);
+                return this.$moment(query.payDate).isAfter(lastThursday);
             },
             generatePdf: function (query) {
                 pdfMake.createPdf(generateDefinition(query, this.$store.state.user)).open();

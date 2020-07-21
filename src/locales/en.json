@@ -40,6 +40,8 @@
   "Print": "Print",
   "Queries": "Queries",
   "Reason": "Reason",
+  "TitleTooLong":"Please enter a shorter title",
+  "ReasonTooLong":"Please specify a shorter reason",
   "ReasonRequired": "",
   "Reject": "Reject",
   "Repair": "Repair",

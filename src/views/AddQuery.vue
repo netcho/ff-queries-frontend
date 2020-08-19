@@ -93,9 +93,23 @@
                                 <v-card-title>{{$t('AddActivityTitle')}}</v-card-title>
                                 <v-card-text>
                                     <v-form v-model="newActivityFormValid" ref="activityForm">
-                                        <v-select :items="companies" :label="$t('Company')" v-model="newActivity.company"></v-select>
-                                        <v-text-field :label="$t('Title')" v-model="newActivity.name"></v-text-field>
-                                        <v-text-field :label="$t('Price')" type="number" v-model="newActivity.price"></v-text-field>
+                                        <v-select v-model="newActivity.company"
+                                                  :items="companies"
+                                                  :label="$t('Company')"
+                                                  :error-messages="companyErrors"
+                                                  @blur="$v.newActivity.company.$touch()"
+                                                  @input="$v.newActivity.company.$touch()"></v-select>
+                                        <v-text-field v-model="newActivity.name"
+                                                      :label="$t('Title')"
+                                                      :error-messages="activityNameErrors"
+                                                      @blur="$v.newActivity.name.$touch()"
+                                                      @input="$v.newActivity.name.$touch()"></v-text-field>
+                                        <v-text-field type="number"
+                                                      v-model="newActivity.price"
+                                                      :label="$t('Price')"
+                                                      :error-messages="priceErrors"
+                                                      @blur="$v.newActivity.price.$touch()"
+                                                      @input="$v.newActivity.price.$touch()"></v-text-field>
                                         <v-checkbox :label="$t('VATIncluded')" v-model="newActivity.priceVAT"></v-checkbox>
                                         <v-text-field :label="$t('Places')" v-model="newActivity.places"></v-text-field>
                                     </v-form>
@@ -255,6 +269,29 @@
                     return errors;
                 !this.$v.reason.required && errors.push(this.$t('ReasonRequired'));
                 !this.$v.reason.maxLength && errors.push(this.$t('ReasonTooLong'));
+                return errors;
+            },
+            companyErrors: function () {
+                const errors = [];
+                if (!this.$v.newActivity.company.$dirty)
+                    return errors;
+                !this.$v.newActivity.company.required && errors.push(this.$t('CompanyRequired'));
+                return errors;
+            },
+            activityNameErrors: function () {
+                const errors = [];
+                if (!this.$v.newActivity.name.$dirty)
+                    return errors;
+                !this.$v.newActivity.name.required && errors.push(this.$t('ActivityNameRequired'));
+                !this.$v.newActivity.name.minLength && errors.push(this.$t('ActivityNameTooShort'));
+                !this.$v.newActivity.name.maxLength && errors.push(this.$t('ActivityNameTooLong'));
+                return errors;
+            },
+            priceErrors: function () {
+                const errors = [];
+                if (!this.$v.newActivity.price.$dirty)
+                    return errors;
+                !this.$v.newActivity.price.required && errors.push(this.$t('PriceRequired'));
                 return errors;
             }
         },

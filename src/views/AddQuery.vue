@@ -344,7 +344,6 @@
             closeActivityDialog: function () {
                 this.showActivityDialog = false;
                 this.showAddButton = false;
-                this.showUpdateButton = false;
                 this.initNewActivity();
             },
             calculateVAT: function (price) {

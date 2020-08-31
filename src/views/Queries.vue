@@ -195,7 +195,7 @@
                 widths: [400, 60, 40],
                 body: []
             },
-            margin: [ 15, 0, 15, 0 ]
+            margin: [ 15, 10, 15, 0 ]
         }
 
         query.activities.forEach((activity, index) => {
@@ -213,9 +213,9 @@
         });
 
         let activitiesSummary = [
-            { text: 'Всичко без ДДС: ', style: 'rightAlignBold' },
+            { text: 'Всичко :', style: 'rightAlignBold' },
             { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(totalSumWithoutVAT), style: 'rightAlignBold' },
-            { text: '' }
+            { text: 'без ДДС', style: 'mainTextBold' }
         ];
 
         activities.table.body.push(activitiesSummary);
@@ -233,7 +233,7 @@
                 style: 'mainTextBold'
             }],
             columnGap: 8,
-            margin: [15, 20, 15, 0]
+            margin: [15, 10, 15, 0]
         };
 
         contragent.columns[0].stack.push({ text: 'Контрагент: ', margin: [ 0, 0, 0, 10 ] });
@@ -246,10 +246,10 @@
         let payTotal = {
             columns: [
                 { text: 'За плащане:', style: 'totalSumRight', width: 'auto' },
-                { text: query.totalSum + ' лв.', width: '*', style: 'totalSum' }
+                { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(query.totalSum) + ' лв. с ДДС', width: '*', style: 'totalSum' }
             ],
             columnGap: 25,
-            margin: [ 165, 20, 15, 0 ]
+            margin: [ 165, 10, 15, 0 ]
         };
 
         definition.content.push(payTotal);
@@ -265,7 +265,7 @@
                 style: 'mainTextBold'
             }],
             columnGap: 8,
-            margin: [15, 20, 15, 0]
+            margin: [15, 10, 15, 0]
         }
 
         paymentInfo.columns[0].stack.push({ text: 'Дата на плащане: ', margin: [ 0, 0, 0, 10 ] });

@@ -287,9 +287,7 @@
                 { text: 'Съставил:.....................................', style: 'signature', margin: [0, 50, 10, 0] },
                 { text: madeBy, style: 'signatureRight', margin: [0, 0, 60, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] },
-                { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Вл. Николов/', style: 'signatureRight', margin: [0, 0, 60, 0] }
+                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 
@@ -307,7 +305,7 @@
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
                 { text: '/Вл. Кънчев/', style: 'signatureRight', margin: [0, 0, 60, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Доли Николова/', style: 'signatureRight', margin: [0, 0, 60, 0] }
+                { text: '/Вл. Николов/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 

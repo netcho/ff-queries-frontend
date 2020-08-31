@@ -246,7 +246,7 @@
         let payTotal = {
             columns: [
                 { text: 'За плащане:', style: 'totalSumRight', width: 'auto' },
-                { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(query.totalSum) + ' лв. с ДДС', width: '*', style: 'totalSum' }
+                { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(query.totalSum) + ' с ДДС', width: '*', style: 'totalSum' }
             ],
             columnGap: 25,
             margin: [ 165, 10, 15, 0 ]

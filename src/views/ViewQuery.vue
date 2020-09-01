@@ -60,7 +60,9 @@
                         </template>
                         <v-list-item v-for="(activity, index) in query.activities" :key="index">
                             <v-list-item-content>
-                                <v-list-item-title>{{index + 1}}. {{activity.company}} - {{activity.name}} {{$t('PriceVAT')}}: {{ calculateVAT(activity.price) }}</v-list-item-title>
+                                <v-list-item-title>
+                                    {{index + 1}}. {{activity.company}} - {{activity.name}} {{$t('PriceVAT')}}: {{ calculateVAT(activity.price) }}
+                                </v-list-item-title>
                                 <v-list-item-subtitle>{{activity.places}}</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>

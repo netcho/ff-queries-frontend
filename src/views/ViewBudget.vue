@@ -25,7 +25,7 @@
         </v-card>
         <v-row class="title ma-5">
             <v-spacer></v-spacer>
-            <div class="mr-11">{{$t('TotalSumVAT')}}: {{ budget.totalSum }}</div>
+            <div class="ml-16">{{$t('TotalSumVAT')}}: {{ budget.totalSum }}</div>
         </v-row>
     </v-container>
 </template>
@@ -103,7 +103,7 @@
                 { text: this.$t('Places'), value: 'places' },
                 { text: this.$t('Companies'), value: 'companies' },
                 { text: this.$t('Contractor'), value: 'contractor' },
-                { text: this.$t('Sum'), value: 'totalSum' },
+                { text: this.$t('Sum'), value: 'totalSum', align: 'end' },
                 { text: this.$t('PayDate'), value: 'payDate' }
             ];
         },

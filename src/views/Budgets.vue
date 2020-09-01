@@ -76,6 +76,16 @@
         return result;
     }
 
+    function truncateContragentName(name) {
+        let parts = name.split(' ');
+        if (parts[parts.length - 1] === 'ЕООД' || parts[parts.length - 1] === 'ООД' || parts[parts.length - 1] === 'АД' || parts[parts.length - 1] === 'ЕАД') {
+            return parts.splice(0, parts.length - 1).join(' ');
+        }
+        else {
+            return name;
+        }
+    }
+
     function generateQueryRows(queries) {
         let segment = {
             table: {
@@ -98,9 +108,9 @@
 
             row.push({ text: places, style: 'row' });
             row.push({ text: getCompaniesFromActivities(query, true), style: 'row' });
-            row.push({ text: query.contractor, style: 'row' });
+            row.push({ text: truncateContragentName(query.contractor), style: 'row' });
             let payDate = moment(query.payDate);
-            row.push({ text: query.totalSum, style: 'sumCell' });
+            row.push({ text: new Intl.NumberFormat('bg-BG',{style: 'decimal'}).format(query.totalSum), style: 'sumCell' });
             row.push({ text: payDate.format('D.M'), style: 'row' });
             segment.table.body.push(row);
         });
@@ -295,7 +305,7 @@
         },
         methods: {
             calculateColumns: function (rowNumber) {
-                return (rowNumber * 5) < this.budgets.length ? 5 : (rowNumber * 5) - this.budgets.length - 1;
+                return this.budgets.length >= (rowNumber * 5) ? 5 : this.budgets.length % 5;
             },
             printBudget: function (week) {
                 this.$http.get('/budget?week=' + week).

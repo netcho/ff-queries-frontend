@@ -1,14 +1,14 @@
 <template>
     <v-item-group>
         <v-container>
-            <v-row v-for="n in rows" :key="n" class="d-flex align-start">
-                <v-col v-for="k in calculateColumns(n)" :key="5* (n-1) + k">
-                    <v-card height="200" width="300" tile @click="goToBudget(budgets[5*(n-1)+k-1]._id)">
-                        <v-card-title>{{$t('Week')}} {{ budgets[5*(n-1)+k-1]._id }}</v-card-title>
-                        <v-card-text>{{$t('TotalSumWeek')}}: {{ budgets[5*(n-1)+k-1].totalSum }}</v-card-text>
+            <v-row v-for="n in rows" :key="n" :class="`d-flex justify-start`">
+                <v-col v-for="k in calculateColumns(n)" :key="6* (n-1) + k">
+                    <v-card height="150" width="240" tile @click="goToBudget(budgets[6*(n-1)+k-1]._id)">
+                        <v-card-title>{{$t('Week')}} {{ budgets[6*(n-1)+k-1]._id }}</v-card-title>
+                        <v-card-text>{{$t('TotalSumWeek')}}: {{ budgets[6*(n-1)+k-1].totalSum }}</v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn icon @click.stop="printBudget(budgets[5*(n-1)+k-1]._id)">
+                            <v-btn icon @click.stop="printBudget(budgets[6*(n-1)+k-1]._id)">
                                 <v-icon>mdi-printer</v-icon>
                             </v-btn>
                         </v-card-actions>
@@ -305,7 +305,7 @@
         },
         methods: {
             calculateColumns: function (rowNumber) {
-                return this.budgets.length >= (rowNumber * 5) ? 5 : this.budgets.length % 5;
+                return this.budgets.length >= (rowNumber * 6) ? 6 : this.budgets.length % 6;
             },
             printBudget: function (week) {
                 this.$http.get('/budget?week=' + week).
@@ -321,7 +321,7 @@
             this.$http.get('/budgets').
             then((response) => {
                 this.budgets = response.data;
-                this.rows = math.ceil(this.budgets.length / 5);
+                this.rows = math.ceil(this.budgets.length / 6);
             });
         }
     }

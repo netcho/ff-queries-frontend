@@ -177,7 +177,6 @@
 
         definition.content.push({ text: 'За нуждите на ЕП', style: 'subHeading', margin: [0, 0, 0, 10]});
         definition.content.push({ text: 'З А Я В К А', style: 'title'});
-        definition.content.push({ text: getCompaniesFromActivities(query, true), style: 'companies', margin: [25, 0, 25, 20]});
 
         let main1 = {
             columns: [

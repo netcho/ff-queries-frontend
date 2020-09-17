@@ -212,9 +212,9 @@
         });
 
         let activitiesSummary = [
-            { text: 'Всичко :', style: 'rightAlignBold' },
-            { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(totalSumWithoutVAT), style: 'rightAlignBold' },
-            { text: 'без ДДС', style: 'mainTextBold' }
+            { text: 'Всичко :', style: 'rightAlignBold', margin: [ 0, 10 ] },
+            { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(totalSumWithoutVAT), style: 'rightAlignBold', margin: [ 0 , 10 ] },
+            { text: 'без ДДС', style: 'mainTextBold', margin: [ 0, 10 ] }
         ];
 
         activities.table.body.push(activitiesSummary);
@@ -248,7 +248,7 @@
                 { text: new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(query.totalSum) + ' с ДДС', width: '*', style: 'totalSum' }
             ],
             columnGap: 25,
-            margin: [ 165, 10, 15, 0 ]
+            margin: [ 165, 20, 15, 10 ]
         };
 
         definition.content.push(payTotal);
@@ -318,7 +318,7 @@
         };
 
         definition.content.push(signatures);
-        definition.content.push({text: dateCreated.toLocaleDateString('bg-BG'), style: 'date', margin: [0, 15, 0, 0]});
+        definition.content.push({text: dateCreated.toLocaleDateString('bg-BG'), style: 'date', margin: [0, 30, 0, 0]});
 
         return definition;
     }

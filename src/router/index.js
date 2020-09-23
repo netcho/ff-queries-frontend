@@ -56,6 +56,14 @@ const routes = [
         requiresAuth: true
       },
       component: () => import(/* webpackChunkName: "Budgets" */ '@/views/ViewBudget.vue')
+    },
+    {
+      path: 'inquiries',
+      name: 'Inquiries',
+      meta: {
+        requiresAuth: true,
+      },
+      component: () => import(/* webpackChunkName: "Inquiries "*/ '@/views/Inquiries.vue')
     }
     ]
   }

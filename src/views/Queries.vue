@@ -110,7 +110,7 @@
         return companies;
     }
 
-    function generateDefinition(query, user) {
+    function generateDefinition(query) {
         let definition = {
             content: [],
             styles: {
@@ -279,38 +279,29 @@
 
         definition.content.push(paymentInfo);
 
-        let madeBy = '/' + user.firstName.substring(0, 1) + '. ' + user.lastName + '/';
-
         let signatures1 = {
             stack: [
-                { text: 'Съставил:.....................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: madeBy, style: 'signatureRight', margin: [0, 0, 60, 0] },
+                { text: 'Изготвил:.....................................', style: 'signature', margin: [0, 50, 10, 0] },
+                { text: '/Хр. Спасов/', style: 'signatureRight', margin: [0, 0, 65, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] }
+                { text: '/Ян. Стойчев/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 
         let signatures2 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Хр. Спасов/', style: 'signatureRight', margin: [0, 0, 65, 0] },
+                { text: '/Вл. Кънчев/', style: 'signatureRight', margin: [0, 0, 65, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Ян. Стойчев/', style: 'signatureRight', margin: [10, 0, 60, 0] },
+                { text: '/Вл. Николов/', style: 'signatureRight', margin: [10, 0, 60, 0] },
             ]
         }
 
         let signatures3 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Вл. Кънчев/', style: 'signatureRight', margin: [0, 0, 60, 0] },
-                { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Вл. Николов/', style: 'signatureRight', margin: [0, 0, 60, 0] }
+                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
-        }
-
-        if (query.isUrgent) {
-            signatures2.stack.push({ text: 'Одобрил:...................................', style: 'signature', margin: [0, 50, 10, 0] })
-            signatures2.stack.push({ text: 'В. Николов', style: 'signatureRight', margin: [0, 0, 40, 0] });
         }
 
         let signatures = {
@@ -375,7 +366,7 @@
                 return this.$moment(query.payDate).isAfter(lastThursday);
             },
             generatePdf: function (query) {
-                pdfMake.createPdf(generateDefinition(query, this.$store.state.user)).open();
+                pdfMake.createPdf(generateDefinition(query)).open();
             },
             getColor: function (query) {
                 switch (query.status) {

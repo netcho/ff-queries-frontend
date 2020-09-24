@@ -13,13 +13,15 @@
                         </v-chip-group>
                         <v-select v-model="category"
                                   :items="categories"
-                                  item-text="name"
                                   :label="$t('Category')"
                                   :error-messages="categoryErrors"
                                   @input="$v.category.$touch()"
                                   @blur="$v.category.$touch()">
                             <template v-slot:item="{ item }">
                                 {{ item.name }} ( {{ item.code }}/{{ item.subcode }} )
+                            </template>
+                            <template v-slot:selection="{ item }">
+                                {{ item.name }}
                             </template>
                         </v-select>
                         <v-text-field v-model="title"

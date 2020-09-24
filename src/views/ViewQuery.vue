@@ -45,7 +45,7 @@
                             <v-icon>mdi-apps</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>{{$t('Category')}}</v-list-item-title>
-                        <v-list-item-subtitle class="text-right">{{ query.category }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-right">{{ query.category.name }} ( {{ query.category.code }} / {{ query.category.subcode }})</v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-icon>

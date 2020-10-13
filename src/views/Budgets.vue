@@ -138,7 +138,7 @@
         }
     }
 
-    function generateDefinition(budget, week, user) {
+    function generateDefinition(budget, week) {
         let definition = {
             content: [{
                 columns: []
@@ -261,13 +261,9 @@
                 { text: '......................................................', style: 'row', margin: [5, 40, 0, 0] },
                 { text: 'Съгласувал: Вл. Кънчев', style: 'name', margin: [5, 0, 0, 0] },
                 { text: '......................................................', style: 'row', margin: [5, 40, 0, 0] },
-                { text: 'Съгласувал: Хр. Спасов', style: 'name', margin: [5, 0, 0, 0] }
+                { text: 'Изготвил: Хр. Спасов', style: 'name', margin: [5, 0, 0, 0] }
             ]
         }
-
-        let madeBy = user.firstName.substring(0, 1) + ' ' + user.lastName;
-        signatureColumns.stack.push({ text: '......................................................', style: 'row', margin: [5, 40, 0, 0] });
-        signatureColumns.stack.push({ text: 'Изготвил: ' + madeBy, style: 'name', margin: [5, 0, 0, 0]});
 
         let dateCreated = moment();
         dateCreated.week(week - 1);
@@ -310,7 +306,7 @@
             printBudget: function (week) {
                 this.$http.get('/budget?week=' + week).
                 then((response) => {
-                    pdfMake.createPdf(generateDefinition(response.data, week, this.$store.state.user)).open();
+                    pdfMake.createPdf(generateDefinition(response.data, week)).open();
                 })
             },
             goToBudget: function(week) {

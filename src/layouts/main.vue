@@ -18,14 +18,22 @@
               <v-list-item-title>{{$t('Queries')}}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-            <v-list-item link :to="{ name: 'Budgets' }">
-                <v-list-item-action>
-                    <v-icon>mdi-file-table</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                    <v-list-item-title>{{$t('Budgets')}}</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
+          <v-list-item link :to="{ name: 'Budgets' }">
+            <v-list-item-action>
+              <v-icon>mdi-file-table</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>{{$t('Budgets')}}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item link :to="{ name: 'Users' }" v-if="$can('read', 'User')">
+              <v-list-item-action>
+                  <v-icon>mdi-account-group</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                  <v-list-item-title>{{$t('Users')}}</v-list-item-title>
+              </v-list-item-content>
+          </v-list-item>
           <v-list-item @click="logout">
               <v-list-item-action>
                   <v-icon>mdi-logout</v-icon>
@@ -43,9 +51,9 @@
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
         <v-toolbar-title>Application</v-toolbar-title>
       </v-app-bar>
-      <v-content>
+      <v-main>
         <router-view></router-view>
-      </v-content>
+      </v-main>
       <v-footer color="indigo" app>
         <span class="white--text">&copy; 2019</span>
       </v-footer>
@@ -74,3 +82,9 @@
     }
   }
 </script>
+
+<style>
+#inspire {
+    background-color: #E8EAF6;
+}
+</style>

@@ -6,6 +6,10 @@ import { Ability } from '@casl/ability';
 
 Vue.use(Vuex);
 
+function StringUCFirst(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export default new Vuex.Store({
   state: {
     status: '',
@@ -22,13 +26,12 @@ export default new Vuex.Store({
       state.token = token;
       state.user = user;
 
-      if (user.role === 'admin' || user.role === 'user') {
-        state.rules = [
-          { action: 'read', subject: 'Query' },
-          { action: 'create', subject: 'Query' },
-          { action: 'update', subject: 'Query' },
-          { action: 'delete', subject: 'Query' }];
-      }
+      Object.keys(user.permissions).forEach((category) => {
+        const actions = user.permissions[category];
+        actions.forEach((action) => {
+          state.rules.push({action: action, subject: StringUCFirst(category) });
+        });
+      });
     },
     auth_error(state) {
       state.status = 'error';

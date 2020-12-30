@@ -18,13 +18,13 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item @click="rejectQuery" v-if="$can('update', 'Query')">
+                            <v-list-item @click="rejectQuery" v-if="$can('reject', 'Query')">
                                 <v-list-item-title><v-icon>mdi-file-excel</v-icon>{{$t('Reject')}}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="redactQuery" v-if="$can('update', 'Query')">
                                 <v-list-item-title><v-icon>mdi-file-document-edit</v-icon>{{$t('Edit')}}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="deleteQuery">
+                            <v-list-item @click="deleteQuery" v-if="$can('delete', 'Query')">
                                 <v-list-item-title><v-icon>mdi-trash-can</v-icon>{{$t('Delete')}}</v-list-item-title>
                             </v-list-item>
                         </v-list>

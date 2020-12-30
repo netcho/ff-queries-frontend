@@ -1,5 +1,5 @@
 <template>
-    <v-container class="pt-5">
+    <v-container class="pt-5" fluid>
         <v-card>
             <v-card-title>
                 {{$t('Queries')}}

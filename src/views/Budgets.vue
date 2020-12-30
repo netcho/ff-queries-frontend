@@ -1,22 +1,20 @@
 <template>
-    <v-item-group>
-        <v-container>
-            <v-row v-for="n in rows" :key="n" :class="`d-flex justify-start`">
-                <v-col v-for="k in calculateColumns(n)" :key="6* (n-1) + k">
-                    <v-card height="150" width="240" tile @click="goToBudget(budgets[6*(n-1)+k-1]._id)">
-                        <v-card-title>{{$t('Week')}} {{ budgets[6*(n-1)+k-1]._id }}</v-card-title>
-                        <v-card-text>{{$t('TotalSumWeek')}}: {{ budgets[6*(n-1)+k-1].totalSum }}</v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn icon @click.stop="printBudget(budgets[6*(n-1)+k-1]._id)">
-                                <v-icon>mdi-printer</v-icon>
-                            </v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
-    </v-item-group>
+    <v-container>
+        <v-row v-for="n in rows" :key="n" :class="`d-flex justify-start`">
+            <v-col v-for="k in calculateColumns(n)" :key="6* (n-1) + k">
+                <v-card height="150" width="240" tile @click="goToBudget(budgets[6*(n-1)+k-1].year, budgets[6*(n-1)+k-1]._id)">
+                    <v-card-title>{{$t('Week')}} {{ budgets[6*(n-1)+k-1]._id }} / {{ budgets[6*(n-1)+k-1].year }}</v-card-title>
+                    <v-card-text>{{$t('TotalSumWeek')}}: {{ budgets[6*(n-1)+k-1].totalSum }}</v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn icon @click.stop="printBudget(budgets[6*(n-1)+k-1].year, budgets[6*(n-1)+k-1]._id)">
+                            <v-icon>mdi-printer</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
@@ -138,7 +136,7 @@
         }
     }
 
-    function generateDefinition(budget, week) {
+    function generateDefinition(budget, year, week) {
         let definition = {
             content: [{
                 columns: []
@@ -265,8 +263,8 @@
             ]
         }
 
-        let dateCreated = moment();
-        dateCreated.week(week - 1);
+        let dateCreated = moment({ year: parseInt(year, 10)});
+        dateCreated.week(parseInt(week, 10) === 1 ? 1 : week - 1);
         dateCreated.isoWeekday(4);
 
         let total = 0;
@@ -303,14 +301,14 @@
             calculateColumns: function (rowNumber) {
                 return this.budgets.length >= (rowNumber * 6) ? 6 : this.budgets.length % 6;
             },
-            printBudget: function (week) {
-                this.$http.get('/budget?week=' + week).
+            printBudget: function (year, week) {
+                this.$http.get('/budget', {params: { week: week, year: year}}).
                 then((response) => {
-                    pdfMake.createPdf(generateDefinition(response.data, week)).open();
+                    pdfMake.createPdf(generateDefinition(response.data, year, week)).open();
                 })
             },
-            goToBudget: function(week) {
-                this.$router.push({ name: 'ViewBudget', params: { week: week }});
+            goToBudget: function(year, week) {
+                this.$router.push({ name: 'ViewBudget', params: { year: year, week: week }});
             }
         },
         created: function () {

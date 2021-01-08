@@ -72,7 +72,15 @@ const routes = [
         requiresAuth: true
       },
       component: () => import(/* webpackChunkName: "Users" */ '@/views/EditUser')
-    }
+    },
+      {
+        path: 'inquiry',
+        name: 'Inquiry',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import(/* webpackChunkName: "Inquiry"*/ '@/views/Inquiries')
+      }
     ]
   }
 ];

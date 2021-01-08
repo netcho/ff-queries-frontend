@@ -58,12 +58,20 @@ const routes = [
       component: () => import(/* webpackChunkName: "Budgets" */ '@/views/ViewBudget.vue')
     },
     {
-      path: 'inquiries',
-      name: 'Inquiries',
+      path: 'users',
+      name: 'Users',
       meta: {
-        requiresAuth: true,
+        requiresAuth: true
       },
-      component: () => import(/* webpackChunkName: "Inquiries "*/ '@/views/Inquiries.vue')
+      component: () => import(/* webpackChunkName: "Users" */ '@/views/Users')
+    },
+    {
+      path: 'users/:id',
+      name: 'EditUser',
+      meta: {
+        requiresAuth: true
+      },
+      component: () => import(/* webpackChunkName: "Users" */ '@/views/EditUser')
     }
     ]
   }

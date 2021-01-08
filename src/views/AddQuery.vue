@@ -11,13 +11,19 @@
                             <v-chip :value="'Investment'">{{$t('Investment')}}</v-chip>
                             <v-chip :value="'Transport'">{{$t('Transport')}}</v-chip>
                         </v-chip-group>
-                        <v-combobox v-model="category"
-                                    :items="categories"
-                                    :label="$t('Category')"
-                                    :error-messages="categoryErrors"
-                                    @input="$v.category.$touch()"
-                                    @blur="$v.category.$touch()">
-                        </v-combobox>
+                        <v-select v-model="category"
+                                  :items="categories"
+                                  :label="$t('Category')"
+                                  :error-messages="categoryErrors"
+                                  @input="$v.category.$touch()"
+                                  @blur="$v.category.$touch()">
+                            <template v-slot:item="{ item }">
+                                {{ item.name }} ( {{ item.code }}/{{ item.subcode }} )
+                            </template>
+                            <template v-slot:selection="{ item }">
+                                {{ item.name }}
+                            </template>
+                        </v-select>
                         <v-text-field v-model="title"
                                       :label="$t('Title')"
                                       :error-messages="titleErrors"

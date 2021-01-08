@@ -108,7 +108,7 @@
             ];
         },
         mounted: function () {
-            this.$http.get('/budget?week=' + this.$route.params.week).
+            this.$http.get('/budget', { params:{ year: this.$route.params.year, week: this.$route.params.week}}).
             then((response) => {
                 this.budget = response.data;
             }).

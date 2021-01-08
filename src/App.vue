@@ -1,7 +1,5 @@
 <template>
-    <div id="app">
-        <component v-bind:is="layout"></component>
-    </div>
+    <component v-bind:is="layout"></component>
 </template>
 
 <script>
@@ -9,9 +7,6 @@
     import SimpleLayout from './layouts/simple'
 
     export default {
-        data: () => ({
-            drawer: false,
-        }),
         computed: {
           layout: function () {
               return this.$store.getters.isLoggedIn ? 'AppLayout' : 'SimpleLayout';

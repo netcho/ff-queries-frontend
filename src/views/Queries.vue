@@ -1,5 +1,5 @@
 <template>
-    <v-container class="pt-5">
+    <v-container class="pt-5" fluid>
         <v-card>
             <v-card-title>
                 {{$t('Queries')}}
@@ -39,6 +39,14 @@
             </template>
             <template v-slot:item.totalSum="{ item }">
                 {{ new Intl.NumberFormat('bg-BG', { style: 'currency', currency: 'BGN' }).format(item.totalSum)}}
+            </template>
+            <template v-slot:item.category="{ item }">
+                <div v-if="typeof item.category === 'object'">
+                    {{ item.category.name }}
+                </div>
+                <div v-else>
+                    {{ item.category }}
+                </div>
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-row justify="space-around" class="flex-nowrap">
@@ -124,6 +132,10 @@
                     bold: true,
                     alignment: 'right'
                 },
+                subHead: {
+                    fontSize: 11,
+                    alignment: 'center'
+                },
                 companies: {
                     fontSize: 10,
                     alignment: 'center'
@@ -177,6 +189,7 @@
 
         definition.content.push({ text: 'За нуждите на ЕП', style: 'subHeading', margin: [0, 0, 0, 10]});
         definition.content.push({ text: 'З А Я В К А', style: 'title'});
+        definition.content.push({ text: query.category.name + ' (' + query.category.code + '/' + query.category.subcode + ')', style: 'subHead' });
 
         let main1 = {
             columns: [

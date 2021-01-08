@@ -263,8 +263,9 @@
             ]
         }
 
-        let dateCreated = moment({ year: parseInt(year, 10)});
-        dateCreated.week(parseInt(week, 10) === 1 ? 1 : week - 1);
+        let dateCreated = moment();
+        dateCreated.set('year', parseInt(year, 10));
+        dateCreated.isoWeek(parseInt(week, 10));
         dateCreated.isoWeekday(4);
 
         let total = 0;

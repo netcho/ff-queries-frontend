@@ -15,7 +15,7 @@ const routes = [
       name: 'Login',
       component: () => import(/* webpackChunkName: "Login" */'@/views/Login.vue')},
     {
-      path: '',
+      path: 'dashboard',
       name: 'Home',
       meta: {
         requiresAuth: true
@@ -72,7 +72,15 @@ const routes = [
         requiresAuth: true
       },
       component: () => import(/* webpackChunkName: "Users" */ '@/views/EditUser')
-    }
+    },
+      {
+        path: 'inquiry',
+        name: 'Inquiry',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import(/* webpackChunkName: "Inquiry"*/ '@/views/Inquiries')
+      }
     ]
   }
 ];
@@ -87,7 +95,7 @@ router.beforeEach((to, from, next) => {
   if (lang)
     loadLanguageAsync(lang).then(() => next());
   else
-    next('/bg')
+    next('/bg/dashboard')
 });
 
 router.beforeEach(((to, from, next) => {

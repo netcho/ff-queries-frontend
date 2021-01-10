@@ -26,6 +26,14 @@
               <v-list-item-title>{{$t('Budgets')}}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item link :to="{ name: 'Inquiry' }">
+                <v-list-item-action>
+                    <v-icon>mdi-folder-table</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                    <v-list-item-title>{{$t('Inquiries')}}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
           <v-list-item link :to="{ name: 'Users' }" v-if="$can('read', 'User')">
               <v-list-item-action>
                   <v-icon>mdi-account-group</v-icon>

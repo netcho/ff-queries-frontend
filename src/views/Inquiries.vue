@@ -83,8 +83,8 @@
                 </v-data-table>
                 <v-row>
                     <v-spacer></v-spacer>
-                    <v-col cols="4"><h3>{{$t('AllInvestmentsForPeriod')}}: {{allInvestmentSum}}</h3></v-col>
-                    <v-col cols="4"><h3>{{$t('AllSupportForPeriod')}}: {{allSupportSum}}</h3></v-col>
+                    <v-col cols="4" class="ml-3"><h3>{{$t('AllInvestmentsForPeriod')}}: {{allInvestmentSum}} {{$t('BGNWithVAT')}}</h3></v-col>
+                    <v-col cols="4" class="mr-5"><h3>{{$t('AllSupportForPeriod')}}: {{allSupportSum}} {{$t('BGNWithVAT')}}</h3></v-col>
                 </v-row>
             </v-card-text>
         </v-card>
@@ -142,7 +142,7 @@
             },
             allSupportSum: function () {
                 return this.entries.length ? this.entries.reduce(function (acc, company) {
-                    return acc + Number.parseInt(company.repairsSum, 10) + Number.parseInt(company.supportSum, 10);
+                    return acc + Number.parseInt(company.repairsSum, 10) + Number.parseInt(company.supportSum, 10) + Number.parseInt(company.transportSum, 10);
                 }, 0) : 0;
             }
         },

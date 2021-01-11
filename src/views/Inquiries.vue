@@ -81,6 +81,11 @@
                 <v-data-table :headers="tableHeaders"
                               :items="entries">
                 </v-data-table>
+                <v-row>
+                    <v-spacer></v-spacer>
+                    <v-col cols="4"><h3>{{$t('AllInvestmentsForPeriod')}}: {{allInvestmentSum}}</h3></v-col>
+                    <v-col cols="4"><h3>{{$t('AllSupportForPeriod')}}: {{allSupportSum}}</h3></v-col>
+                </v-row>
             </v-card-text>
         </v-card>
     </v-container>
@@ -129,6 +134,16 @@
                 }
 
                 return result;
+            },
+            allInvestmentSum: function () {
+                return this.entries.length ? this.entries.reduce(function (acc, company) {
+                    return acc + Number.parseInt(company.investmentSum, 10);
+                }, 0) : 0;
+            },
+            allSupportSum: function () {
+                return this.entries.length ? this.entries.reduce(function (acc, company) {
+                    return acc + Number.parseInt(company.repairsSum, 10) + Number.parseInt(company.supportSum, 10);
+                }, 0) : 0;
             }
         },
         watch: {

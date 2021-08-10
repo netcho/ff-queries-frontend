@@ -11,7 +11,7 @@
   "dependencies": {
     "@casl/ability": "^4.1.6",
     "@casl/vue": "^1.2.1",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.8.2",
     "fibers": "^5.0.0",
     "mathjs": "^7.6.0",

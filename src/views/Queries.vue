@@ -304,7 +304,7 @@
         let signatures2 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Вл. Кънчев/', style: 'signatureRight', margin: [0, 0, 65, 0] },
+                { text: '/Дирекция ППК/', style: 'signatureRight', margin: [0, 0, 65, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
                 { text: '/Вл. Николов/', style: 'signatureRight', margin: [10, 0, 60, 0] },
             ]

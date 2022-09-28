@@ -73,6 +73,10 @@
                 result = 'Е.Х.';
                 break;
             }
+            case 'Фантастико Груп': {
+                result = 'Ф. Г.';
+                break;
+            }
         }
 
         return result;

@@ -295,16 +295,16 @@
         let signatures1 = {
             stack: [
                 { text: 'Изготвил:.....................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Хр. Спасов/', style: 'signatureRight', margin: [0, 0, 65, 0] },
+                { text: '/М. Мъндев/', style: 'signatureRight', margin: [0, 0, 65, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Ян. Стойчев/', style: 'signatureRight', margin: [0, 0, 60, 0] }
+                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 
         let signatures2 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/Дирекция ППК/', style: 'signatureRight', margin: [0, 0, 65, 0] },
+                { text: '/Л. Маргаритова/', style: 'signatureRight', margin: [0, 0, 65, 0] },
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
                 { text: '/Вл. Николов/', style: 'signatureRight', margin: [10, 0, 60, 0] },
             ]
@@ -313,7 +313,7 @@
         let signatures3 = {
             stack: [
                 { text: 'Съгласувал:...................................', style: 'signature', margin: [0, 50, 10, 0] },
-                { text: '/В. Божева/', style: 'signatureRight', margin: [0, 0, 60, 0] }
+                { text: '/Ян. Стойчев/', style: 'signatureRight', margin: [0, 0, 60, 0] }
             ]
         }
 

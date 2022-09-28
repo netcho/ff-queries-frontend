@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS base
+FROM node:12-alpine AS base
 WORKDIR /app
 RUN npm install -g serve
 RUN mkdir dist
